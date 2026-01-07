@@ -4,13 +4,14 @@ export interface TeacherNameBlockProps {
     hoTen: string
     hocHam: string
     donVi: string
+    avatar?:string;
 }
 
 const TeacherNameBlock: React.FC<TeacherNameBlockProps> = (props) => {
   return <div className="border shadow-md">
     <div className="relative w-full h-[367px]">
       <Image
-        src="/images/home-bg.jpg"
+        src={props?.avatar ?? "/images/home-bg.jpg"}
         alt=""
         fill
         className="object-cover" // or object-cover, object-center
@@ -31,7 +32,7 @@ const TeacherNameBlock: React.FC<TeacherNameBlockProps> = (props) => {
         <p className="text-slate-400 font-semibold">{props.hocHam}</p>
       </div>
       <div>
-        <p>Trường Đại học Công nghệ Giao thông vận tải</p>
+        <p>Trường Đại học xây dựng Hà Nội</p>
         <p className="text-slate-400 font-semibold">Đơn vị: {props.donVi}</p>
       </div>
     </div>
