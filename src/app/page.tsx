@@ -1,3 +1,4 @@
+'use client'
 import {
   Table,
   TableBody,
@@ -8,10 +9,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { IProfile } from "@/models/profile.model";
-
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { ProfileUserApi } from "./services/profile_user";
 
 export default function Home() {
+
+  const [dataUser, setDataUser] = useState<IProfile | null>(null);
+
+  useEffect(() => {
+    ProfileUserApi.getListProfile(25, 1).then(res => console.log(res))
+
+  })
+
   const data: IProfile[] = [
     {
       stt: 1,
@@ -121,40 +131,40 @@ export default function Home() {
   ];
 
   return (
-    
-      <div>
-        <Table>
-          <TableCaption>Danh sách các giảng viên hiện tại</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[8px] font-bold">#</TableHead>
-              <TableHead className="font-bold">Giảng viên</TableHead>
-              <TableHead className="font-bold">Đơn vị</TableHead>
-              <TableHead className="font-bold">Cơ sở khoa học</TableHead>
-              <TableHead className="font-bold">Lý lịch khoa học</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data &&
-              data.map((item, i) => (
-                <TableRow key={`${i}`}>
-                  <TableCell>{item.stt}</TableCell>
-                  <TableCell>{item.hoTen}</TableCell>
-                  <TableCell>{item.donVi}</TableCell>
-                  <TableCell>{item.coSo}</TableCell>
-                  <TableCell>
-                    <Link
-                      href={"/teacher/thong-tin-chung"}
-                      target="_blank"
-                      className="underline text-blue-500 cursor-pointer"
-                    >
-                      {item.lyLichKhoaHoc}
-                    </Link>
-                  </TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </div>
+
+    <div>
+      <Table>
+        <TableCaption>Danh sách các giảng viên hiện tại</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[8px] font-bold">#</TableHead>
+            <TableHead className="font-bold">Giảng viên</TableHead>
+            <TableHead className="font-bold">Đơn vị</TableHead>
+            <TableHead className="font-bold">Cơ sở khoa học</TableHead>
+            <TableHead className="font-bold">Lý lịch khoa học</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {data &&
+            data.map((item, i) => (
+              <TableRow key={`${i}`}>
+                <TableCell>{item.stt}</TableCell>
+                <TableCell>{item.hoTen}</TableCell>
+                <TableCell>{item.donVi}</TableCell>
+                <TableCell>{item.coSo}</TableCell>
+                <TableCell>
+                  <Link
+                    href={"/teacher/thong-tin-chung"}
+                    target="_blank"
+                    className="underline text-blue-500 cursor-pointer"
+                  >
+                    {item.lyLichKhoaHoc}
+                  </Link>
+                </TableCell>
+              </TableRow>
+            ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 }
