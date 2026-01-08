@@ -1,23 +1,53 @@
 export interface IProfile {
-  stt?: number;
-  hoTen?: string;
-  donVi?: string;
-  coSo?: string;
-  coSoKhoaHoc?: string;
-  mans?: string;
-  lyLichKhoaHoc?: string;
+	stt?: number;
+	hoTen?: string;
+	donVi?: string;
+	coSo?: string;
+	coSoKhoaHoc?: string;
+	mans?: string;
+	lyLichKhoaHoc?: string;
 }
 
 export interface IDetailProfile {
-  idNhanSu?: string;
-  maNhanSu?: string;
-  hoVaTen?: string;
-  ngaySinh?: string;
-  noiSinh?: string;
-  gioiTinh?: boolean;
-  soDienThoai?: string;
-  email?: string;
-  tenChucVu?: string;
-  tenPhongBan?: string;
-  anhDaiDien?: string;
+	idNhanSu?: string;
+	maNhanSu?: string;
+	hoVaTen?: string;
+	ngaySinh?: string;
+	noiSinh?: string;
+	gioiTinh?: boolean;
+	soDienThoai?: string;
+	email?: string;
+	tenChucVu?: string;
+	tenPhongBan?: string;
+	anhDaiDien?: string;
+}
+
+export interface ICongBoKhoaHoc {
+	id?: number;
+	tenVaiTro?: string;
+	idLoaiDeTai?: number;
+	maDeTai?: string;
+	tenDeTai?: string;
+	tenDeTaiURL?: string;
+	idLinhVuc?: number;
+	tenLinhVuc?: string;
+	idDonViChuTri?: number;
+	tenDonViChuTri?: string;
+	idDonViChuTriBenNgoai?: number;
+	tenDonViChiTriBenNgoai?: string;
+	idCapDo?: number;
+	tenCapDo?: string;
+	idLoaiHinhNghienCuu?: number;
+	tenLoaiHinhNghienCuu?: string;
+	idPhongBanDuyet?: number,
+	tenPhongBanDuyet?: string,
+	mucTieu?: string,
+	noiDung?: string,
+	sanPham?: string,
+	ngayBatDau?: string,
+	ngayKetThuc?: string,
+	idXepLoai?: number,
+	tenXepLoai?: string,
+	tongKinhPhi?: number,
+	ungDungChuyenGiao?: string
 }

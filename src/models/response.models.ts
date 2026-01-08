@@ -7,7 +7,7 @@ export interface ResponseBaseApiModel<T> {
 
 export interface ResponseBaseApiItemModel<T> {
   items: T;
-  totals: number;
+  totalItems: number;
 }
 
 export interface ResponseBaseModel<T> {
