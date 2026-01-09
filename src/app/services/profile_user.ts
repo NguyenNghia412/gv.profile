@@ -3,7 +3,7 @@ import {
     ResponseBaseModel,
 } from "@/models/response.models";
 import axiosClient from "./api_services";
-import { ICongBoKhoaHoc, IDetailProfile, IProfile } from "@/models/profile.model";
+import { IBaiBaoCongBo, ICongBoKhoaHoc, IDetailProfile, IProfile } from "@/models/profile.model";
 
 export const ProfileUserApi = {
 
@@ -20,6 +20,12 @@ export const ProfileUserApi = {
     getListProfileCongBoKhoaHoc(pageSize: number, pageNumber: number, id: string): Promise<ResponseBaseApiModel<ICongBoKhoaHoc[]>> {
         return axiosClient.get(
             `/api/core/khcn/gv/cong-bo-kh/de-tai?mans=${id}&pageSize=${pageSize}&pageNumber=${pageNumber}`
+        );
+    },
+
+    getListBaiBaoCongBoKhoaHoc(pageSize: number, pageNumber: number, id: string): Promise<ResponseBaseApiModel<IBaiBaoCongBo[]>> {
+        return axiosClient.get(
+            `api/core/khcn/gv/cong-bo-kh/bai-bao?mans=${id}&pageSize=${pageSize}&pageNumber=${pageNumber}`
         );
     }
 };
