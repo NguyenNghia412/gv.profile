@@ -59,3 +59,24 @@ export interface IBaiBaoCongBo {
     ngayXuatBan?: string,
     soGioQuyDoi?: number
 }
+
+
+export interface IGIaiThuongKHCN {
+    id?: string,
+    tenGiaiThuong?: string,
+    tenCongTrinh?: string,
+    ngayCap?: string,
+    soGioQuyDoi?: number
+}
+
+
+export interface ISachXuatBan {
+    id?: string,
+    ten?: string,
+    nhaXuatBan?: string,
+    ngayXuatBan?: string,
+    soGioQuyDoi?: number,
+    nienHoc?: string,
+}
+
+

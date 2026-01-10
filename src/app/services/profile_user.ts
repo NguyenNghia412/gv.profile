@@ -3,7 +3,7 @@ import {
     ResponseBaseModel,
 } from "@/models/response.models";
 import axiosClient from "./api_services";
-import { IBaiBaoCongBo, ICongBoKhoaHoc, IDetailProfile, IProfile } from "@/models/profile.model";
+import { IBaiBaoCongBo, ICongBoKhoaHoc, IDetailProfile, IGIaiThuongKHCN, IProfile, ISachXuatBan } from "@/models/profile.model";
 
 export const ProfileUserApi = {
 
@@ -26,6 +26,18 @@ export const ProfileUserApi = {
     getListBaiBaoCongBoKhoaHoc(pageSize: number, pageNumber: number, id: string): Promise<ResponseBaseApiModel<IBaiBaoCongBo[]>> {
         return axiosClient.get(
             `api/core/khcn/gv/cong-bo-kh/bai-bao?mans=${id}&pageSize=${pageSize}&pageNumber=${pageNumber}`
+        );
+    },
+
+    getListGiaiThuongKHCN(pageSize: number, pageNumber: number, id: string): Promise<ResponseBaseApiModel<IGIaiThuongKHCN[]>> {
+        return axiosClient.get(
+            `api/core/khcn/gv/cong-bo-kh/giai-thuong?mans=${id}&pageSize=${pageSize}&pageNumber=${pageNumber}`
+        );
+    },
+
+    getListSachXuatBan(pageSize: number, pageNumber: number, id: string): Promise<ResponseBaseApiModel<ISachXuatBan[]>> {
+        return axiosClient.get(
+            `api/core/khcn/gv/cong-bo-kh/tai-lieu?mans=${id}&pageSize=${pageSize}&pageNumber=${pageNumber}`
         );
     }
 };
