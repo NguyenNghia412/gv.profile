@@ -79,4 +79,13 @@ export interface ISachXuatBan {
     nienHoc?: string,
 }
 
+export interface ITriTue {
+    id?:string;
+    tenTaiSanTriTue?:string;
+    soHieu?:string;
+    ngayCapBang?:string;
+    ngayTao?:string;
+    soGioQuyDoi?:string;
+    nienHoc?:string;
+}
 

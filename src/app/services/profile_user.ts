@@ -3,7 +3,7 @@ import {
     ResponseBaseModel,
 } from "@/models/response.models";
 import axiosClient from "./api_services";
-import { IBaiBaoCongBo, ICongBoKhoaHoc, IDetailProfile, IGIaiThuongKHCN, IProfile, ISachXuatBan } from "@/models/profile.model";
+import { IBaiBaoCongBo, ICongBoKhoaHoc, IDetailProfile, IGIaiThuongKHCN, IProfile, ISachXuatBan, ITriTue } from "@/models/profile.model";
 
 export const ProfileUserApi = {
 
@@ -38,6 +38,12 @@ export const ProfileUserApi = {
     getListSachXuatBan(pageSize: number, pageNumber: number, id: string): Promise<ResponseBaseApiModel<ISachXuatBan[]>> {
         return axiosClient.get(
             `api/core/khcn/gv/cong-bo-kh/tai-lieu?mans=${id}&pageSize=${pageSize}&pageNumber=${pageNumber}`
+        );
+    },
+
+    getListTriTue(pageSize: number, pageNumber: number, id: string): Promise<ResponseBaseApiModel<ITriTue[]>> {
+        return axiosClient.get(
+            `api/core/khcn/gv/cong-bo-kh/so-huu-tri-tue?mans=${id}&pageSize=${pageSize}&pageNumber=${pageNumber}`
         );
     }
 };
