@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
+import Providers from "./providers";
 
 export const metadata: Metadata = {
     title: "Đội ngũ giảng viên",
@@ -18,7 +19,9 @@ export default function RootLayout({
             <body className={``}>
                 <div className="bg-white min-h-screen max-h-screen">
                     <Header />
-                    <div className="container mx-auto p-3">{children}</div>
+                    <div className="container mx-auto p-3">
+                        <Providers>{children}</Providers>
+                        </div>
                     <Footer />
                 </div>
             </body>
