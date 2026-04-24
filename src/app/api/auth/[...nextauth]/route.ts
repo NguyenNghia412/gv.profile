@@ -52,7 +52,7 @@ const handler = NextAuth({
         },
       },
 
-      idToken: true,
+      idToken: false,
       checks: ["pkce", "state"],
 
       profile(profile) {
