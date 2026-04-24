@@ -2,9 +2,13 @@ import NextAuth from "next-auth";
 
 const WELL_KNOWN_URL = `${process.env.NEXTAUTH_BASE_URL}/.well-known/openid-configuration`;
 const TOKEN_ENDPOINT = `${process.env.NEXTAUTH_BASE_URL}/connect/token`;
+const CONNECT_AUTHORIZE_URL = `${process.env.NEXTAUTH_BASE_URL}/connect/authorize`;
+const CONNECT_TOKEN_URL = `${process.env.NEXTAUTH_BASE_URL}/connect/token`;
 
 console.log("WELL_KNOWN_URL:", WELL_KNOWN_URL);
 console.log("TOKEN_ENDPOINT:", TOKEN_ENDPOINT);
+console.log("CONNECT_AUTHORIZE_URL:", CONNECT_AUTHORIZE_URL);
+console.log("CONNECT_TOKEN_URL:", CONNECT_TOKEN_URL);
 
 const handler = NextAuth({
   providers: [
@@ -13,7 +17,7 @@ const handler = NextAuth({
       name: "OpenIddict",
       type: "oauth",
 
-      wellKnown: WELL_KNOWN_URL,
+    //   wellKnown: WELL_KNOWN_URL,
 
       clientId: process.env.AUTH_CLIENT_ID,
 
@@ -23,10 +27,12 @@ const handler = NextAuth({
         params: {
           scope: "openid offline_access",
         },
+        url: CONNECT_AUTHORIZE_URL,
       },
 
       // ✅ Chỉ thêm block này, không đụng gì khác
       token: {
+        url: CONNECT_TOKEN_URL,
         async request(context) {
           const { provider, params, checks } = context;
 
@@ -50,6 +56,10 @@ const handler = NextAuth({
           const tokens = await response.json();
           return { tokens };
         },
+      },
+
+      userinfo: {
+        url: `${process.env.NEXTAUTH_BASE_URL}/connect/userinfo`,
       },
 
       idToken: false,
