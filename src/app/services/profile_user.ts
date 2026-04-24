@@ -3,7 +3,7 @@ import {
     ResponseBaseModel,
 } from "@/models/response.models";
 import axiosClient from "./api_services";
-import { IBaiBaoCongBo, ICongBoKhoaHoc, IDetailProfile, IGIaiThuongKHCN, IProfile, ISachXuatBan, ITriTue } from "@/models/profile.model";
+import { IBaiBaoCongBo, ICongBoKhoaHoc, IDetailProfile, IGIaiThuongKHCN, IProfile, ISachXuatBan, ITriTue, IViewRowQuaTrinhCongTac, IViewRowQuaTrinhDaoTao } from "@/models/profile.model";
 
 export const ProfileUserApi = {
 
@@ -45,5 +45,13 @@ export const ProfileUserApi = {
         return axiosClient.get(
             `api/core/khcn/gv/cong-bo-kh/so-huu-tri-tue?mans=${id}&pageSize=${pageSize}&pageNumber=${pageNumber}`
         );
-    }
+    },
+
+    getQuaTrinhCongTac(mans: string): Promise<ResponseBaseModel<IViewRowQuaTrinhCongTac[]>> {
+        return axiosClient.get(`/api/core/khcn/gv/thong-tin-chung/${mans}/qua-trinh-cong-tac`);
+    },
+
+    getQuaTrinhDaoTao(mans: string): Promise<ResponseBaseModel<IViewRowQuaTrinhDaoTao[]>> {
+        return axiosClient.get(`/api/core/khcn/gv/thong-tin-chung/${mans}/qua-trinh-dao-tao`);
+    },
 };

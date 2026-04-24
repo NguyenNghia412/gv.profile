@@ -3,7 +3,7 @@ import LoginToView from "@/components/pages/login-to-view";
 import TeacherItemInfo from "@/components/pages/teacher/teacher-item-info";
 import TeacherNameBlock from "@/components/pages/teacher/teacher-name-block";
 import TeacherSectionTitle from "@/components/pages/teacher/teacher-section-title";
-import { IDetailProfile } from "@/models/profile.model";
+import { IDetailProfile, IViewRowQuaTrinhCongTac, IViewRowQuaTrinhDaoTao } from "@/models/profile.model";
 import {
     Building,
     LocateFixed,
@@ -26,13 +26,33 @@ interface DataIdProfile {
 
 const TeacherThongTinChungPage = ({ params }: DataIdProfile) => {
     const { mans } = params;
+
+    
     const [profile, setProfile] = useState<IDetailProfile>();
+    const [quaTrinhCongTac, setQuaTrinhCongTac] = useState<IViewRowQuaTrinhCongTac[]>([]);
+    const [quaTrinhDaoTao, setQuaTrinhDaoTao] = useState<IViewRowQuaTrinhDaoTao[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         ProfileUserApi.getProfileById(mans)
             .then(res => {
                 setProfile(res.data)
+            })
+            .catch(err => console.error(err))
+            .finally(() => {
+                setLoading(false)
+            })
+        ProfileUserApi.getQuaTrinhCongTac(mans)
+            .then(res => {
+                setQuaTrinhCongTac(res.data)
+            })
+            .catch(err => console.error(err))
+            .finally(() => {
+                setLoading(false)
+            })
+        ProfileUserApi.getQuaTrinhDaoTao(mans)
+            .then(res => {
+                setQuaTrinhDaoTao(res.data)
             })
             .catch(err => console.error(err))
             .finally(() => {

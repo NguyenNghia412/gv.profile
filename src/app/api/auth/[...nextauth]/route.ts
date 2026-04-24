@@ -1,12 +1,8 @@
 import NextAuth from "next-auth";
 
-const WELL_KNOWN_URL = `${process.env.NEXTAUTH_BASE_URL}/.well-known/openid-configuration`;
-const TOKEN_ENDPOINT = `${process.env.NEXTAUTH_BASE_URL}/connect/token`;
-const CONNECT_AUTHORIZE_URL = `${process.env.NEXTAUTH_BASE_URL}/connect/authorize`;
-const CONNECT_TOKEN_URL = `${process.env.NEXTAUTH_BASE_URL}/connect/token`;
+const CONNECT_AUTHORIZE_URL = `${process.env.NEXT_PUBLIC_BASE_URL}/connect/authorize`;
+const CONNECT_TOKEN_URL = `${process.env.NEXT_PUBLIC_BASE_URL}/connect/token`;
 
-console.log("WELL_KNOWN_URL:", WELL_KNOWN_URL);
-console.log("TOKEN_ENDPOINT:", TOKEN_ENDPOINT);
 console.log("CONNECT_AUTHORIZE_URL:", CONNECT_AUTHORIZE_URL);
 console.log("CONNECT_TOKEN_URL:", CONNECT_TOKEN_URL);
 
@@ -47,7 +43,7 @@ const handler = NextAuth({
               : {}),
           });
 
-          const response = await fetch(TOKEN_ENDPOINT, {
+          const response = await fetch(CONNECT_TOKEN_URL, {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: body.toString(),
@@ -59,14 +55,10 @@ const handler = NextAuth({
       },
 
       userinfo: {
-        url: `${process.env.NEXTAUTH_BASE_URL}/connect/userinfo`,
+        url: `${process.env.NEXT_PUBLIC_BASE_URL}/connect/userinfo`,
         async request(context) {
-          console.log(
-            "Fetching user info with access token:",
-            context.tokens.access_token,
-          );
           const response = await fetch(
-            `${process.env.NEXTAUTH_BASE_URL}/connect/userinfo`,
+            `${process.env.NEXT_PUBLIC_BASE_URL}/connect/userinfo`,
             {
               headers: {
                 Authorization: `Bearer ${context.tokens.access_token}`,
@@ -106,9 +98,6 @@ const handler = NextAuth({
     },
 
     async session({ session, token }) {
-      //   session.access_token = token.access_token;
-      //   session.user.id = token.sub;
-      console.log({ token });
       return {
         ...session,
         access_token: token.access_token,
