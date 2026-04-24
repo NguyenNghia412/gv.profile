@@ -17,7 +17,7 @@ const handler = NextAuth({
       name: "OpenIddict",
       type: "oauth",
 
-    //   wellKnown: WELL_KNOWN_URL,
+      //   wellKnown: WELL_KNOWN_URL,
 
       clientId: process.env.AUTH_CLIENT_ID,
 
@@ -60,6 +60,21 @@ const handler = NextAuth({
 
       userinfo: {
         url: `${process.env.NEXTAUTH_BASE_URL}/connect/userinfo`,
+        async request(context) {
+          console.log(
+            "Fetching user info with access token:",
+            context.tokens.access_token,
+          );
+          const response = await fetch(
+            `${process.env.NEXTAUTH_BASE_URL}/connect/userinfo`,
+            {
+              headers: {
+                Authorization: `Bearer ${context.tokens.access_token}`,
+              },
+            },
+          );
+          return await response.json();
+        },
       },
 
       idToken: false,
