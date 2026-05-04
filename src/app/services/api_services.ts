@@ -17,6 +17,16 @@ axiosClient.interceptors.request.use(async (config) => {
     if (session?.access_token) {
         config.headers.Authorization = `Bearer ${session.access_token}`;
     }
+    
+    // Log full URL for debugging
+    const fullUrl = config.baseURL ? `${config.baseURL}${config.url}` : config.url;
+    // eslint-disable-next-line no-console
+    console.log('[axios] Request:', {
+        method: config.method?.toUpperCase(),
+        url: fullUrl,
+        hasToken: !!session?.access_token,
+    });
+    
     return config;
 });
 
