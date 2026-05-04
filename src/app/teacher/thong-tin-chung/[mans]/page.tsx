@@ -17,6 +17,8 @@ import {
 import { useEffect, useState } from "react";
 import { ProfileUserApi } from "@/app/services/profile_user";
 import Loading from "@/components/ui/loading";
+import QuaTrinhDaoTao from "./qua-trinh-dao-tao";
+import QuaTrinhCongTac from "./qua-trinh-cong-tac";
 
 interface DataIdProfile {
     params: {
@@ -110,13 +112,17 @@ const TeacherThongTinChungPage = ({ params }: DataIdProfile) => {
                 </div>
                 <TeacherSectionTitle label={"Quá trình đào tạo"} />
                 <div>
-                    <LoginToView />
+                    <LoginToView>
+                        <QuaTrinhDaoTao data={quaTrinhDaoTao} />
+                    </LoginToView>
                 </div>
                 <h3 className="my-8 font-semibold text-3xl text-slate-600">
                     Quá trình công tác chuyên môn
                 </h3>
                 <div>
-                    <LoginToView />
+                    <LoginToView>
+                        <QuaTrinhCongTac data={quaTrinhCongTac} />
+                    </LoginToView>
                 </div>
             </div>}
 

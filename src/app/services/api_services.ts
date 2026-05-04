@@ -3,7 +3,6 @@ import { getSession } from "next-auth/react";
 import { env } from 'next-runtime-env';
 
 const NEXT_PUBLIC_BASE_URL = env('NEXT_PUBLIC_BASE_URL');
-console.log("API base URL:", NEXT_PUBLIC_BASE_URL);
 
 const axiosClient = axios.create({
     baseURL: `${NEXT_PUBLIC_BASE_URL}`,
@@ -19,15 +18,6 @@ axiosClient.interceptors.request.use(async (config) => {
     if (session?.access_token) {
         config.headers.Authorization = `Bearer ${session.access_token}`;
     }
-    
-    // Log full URL for debugging
-    const fullUrl = config.baseURL ? `${config.baseURL}${config.url}` : config.url;
-    // eslint-disable-next-line no-console
-    console.log('[axios] Request:', {
-        method: config.method?.toUpperCase(),
-        url: fullUrl,
-        hasToken: !!session?.access_token,
-    });
     
     return config;
 });
