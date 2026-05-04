@@ -22,11 +22,11 @@ export default function RootLayout({
       </head>
       <body className={``}>
         <div className="bg-white min-h-screen max-h-screen">
-          <Header />
-          <div className="container mx-auto p-3">
-            <Providers>{children}</Providers>
-          </div>
-          <Footer />
+          <Providers>
+            <Header />
+            <div className="container mx-auto p-3">{children}</div>
+            <Footer />
+          </Providers>
         </div>
       </body>
     </html>
