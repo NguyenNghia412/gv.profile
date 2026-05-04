@@ -1,10 +1,12 @@
 import axios from "axios";
 import { getSession } from "next-auth/react";
+import { env } from 'next-runtime-env';
 
-console.log("API base URL:", process.env.NEXT_PUBLIC_BASE_URL);
+const NEXT_PUBLIC_BASE_URL = env('NEXT_PUBLIC_BASE_URL');
+console.log("API base URL:", NEXT_PUBLIC_BASE_URL);
 
 const axiosClient = axios.create({
-    baseURL: `${process.env.NEXT_PUBLIC_BASE_URL}`,
+    baseURL: `${NEXT_PUBLIC_BASE_URL}`,
     headers: {
         "Content-Type": "application/json",
     },

@@ -15,6 +15,8 @@ import { ProfileUserApi } from "./services/profile_user";
 import { TableSkeleton } from "@/components/ui/loading";
 import { Pagination } from "@/components/ui/pagination";
 
+console.log('env', process.env)
+
 export default function Home() {
     const [dataUser, setDataUser] = useState<IProfile[]>([]);
     const [loading, setLoading] = useState(true);
