@@ -34,6 +34,7 @@ const TeacherThongTinChungPage = ({ params }: DataIdProfile) => {
     const [quaTrinhCongTac, setQuaTrinhCongTac] = useState<IViewRowQuaTrinhCongTac[]>([]);
     const [quaTrinhDaoTao, setQuaTrinhDaoTao] = useState<IViewRowQuaTrinhDaoTao[]>([]);
     const [loading, setLoading] = useState(true);
+    
 
     useEffect(() => {
         ProfileUserApi.getProfileById(mans)
@@ -89,7 +90,7 @@ const TeacherThongTinChungPage = ({ params }: DataIdProfile) => {
                         <TeacherItemInfo
                             icon={Building}
                             label="Địa chỉ"
-                            value="Số 54 Phố Triều Khúc, phường Thanh Xuân Nam, quận Thanh Xuân, thành phố Hà Nội"
+                            value={profile?.diaChi}
                         />
                     </div>
                     <div className="border shadow-md">

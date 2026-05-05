@@ -14,6 +14,7 @@ export interface IDetailProfile {
   hoVaTen?: string;
   ngaySinh?: string;
   noiSinh?: string;
+  diaChi?: string;
   gioiTinh?: boolean;
   soDienThoai?: string;
   email?: string;
