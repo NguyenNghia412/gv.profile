@@ -2,6 +2,10 @@
 
 import { CommonUtils } from "@/lib/common";
 import { useSession, signOut, signIn } from "next-auth/react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { User } from "lucide-react";
+import Link from 'next/link'
+
 
 const UserMenuButton = () => {
   const { data: session } = useSession();
@@ -10,21 +14,33 @@ const UserMenuButton = () => {
     return <button onClick={() => signIn("openiddict")}>Đăng nhập</button>;
   }
 
-  console.log("User session:", session); // Debugging log
-
   const fullname = CommonUtils.getUserFullname((session as any).access_token);
+  const currentMans = CommonUtils.getCurrentMans((session as any).access_token);
 
   return (
     <div className="flex items-center gap-3">
-      <span className="text-sm text-white">
-        {fullname}
-      </span>
-      <button
-        onClick={() => signOut()}
-        className="px-3 py-1 text-sm bg-red-600 hover:bg-red-700 rounded text-white transition"
-      >
-        Đăng xuất
-      </button>
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <div className="flex items-center gap-2 text-sm text-white cursor-pointer font-semibold hover:underline">
+                  <User size={18} />
+                  <span>{fullname}</span>
+                </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-secondaryBlue border-slate-700">
+                <DropdownMenuItem className="!text-white cursor-pointer !hover:text-white hover:underline">
+                    <Link href={`/teacher/thong-tin-chung/${currentMans}`} className="w-full h-full">
+                        Thông tin chung
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="!text-white cursor-pointer !hover:text-white hover:underline">
+                    <Link href={`/teacher/cong-bo-khoa-hoc/${currentMans}`} className="w-full h-full">
+                        Công bố khoa học
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-slate-700" />
+                <DropdownMenuItem className="!text-white cursor-pointer !hover:text-white hover:underline" onClick={() => signOut()}>Đăng xuất</DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
     </div>
   );
 };

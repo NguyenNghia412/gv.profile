@@ -15,7 +15,10 @@ export const CommonUtils = {
   },
   getUserFullname: (token: string) => {
     const jwtPayload = CommonUtils.parseJwt(token);
-    console.log("jwtPayload", jwtPayload);
     return jwtPayload?.name || "User";
   },
+  getCurrentMans: (token: string) => {
+    const jwtPayload = CommonUtils.parseJwt(token);
+    return jwtPayload?.sub || null;
+  }
 };
