@@ -8,7 +8,7 @@ const SESSION_COOKIE = process.env.NEXTAUTH_URL?.startsWith("https")
 
 export async function GET(req: NextRequest) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET! });
-
+    console.log('TOKEN', token);
     if (!token?.refresh_token) {
         return NextResponse.json({ error: "No refresh token" }, { status: 401 });
     }
