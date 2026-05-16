@@ -1,13 +1,12 @@
 "use client";
 import { ProfileUserApi } from "@/app/services/profile_user";
+import { CELL_VIEW_TYPES, DataTable } from "@/components/pages/data-table";
 import TeacherNameBlock from "@/components/pages/teacher/teacher-name-block";
 import TeacherSectionTitle from "@/components/pages/teacher/teacher-section-title";
-import Loading, { TableSkeleton } from "@/components/ui/loading";
-import { Pagination } from "@/components/ui/pagination";
+import Loading from "@/components/ui/loading";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -29,166 +28,127 @@ interface DataIdProfile {
   };
 }
 
+function usePagination(initialPageSize = 10) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(initialPageSize);
+  const [totalItems, setTotalItems] = useState(0);
+
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const startItem = totalItems > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+  const endItem = Math.min(currentPage * pageSize, totalItems);
+
+  return {
+    setTotalItems,
+    tableProps: {
+      currentPage,
+      pageSize,
+      totalItems,
+      totalPages,
+      startItem,
+      endItem,
+      onPageChange: setCurrentPage,
+      onPageSizeChange: setPageSize,
+    },
+  };
+}
+
 const CongBoKhoaHoc = ({ params }: DataIdProfile) => {
   const { mans } = params;
   const [profile, setProfile] = useState<IDetailProfile>();
   const [profileLoading, setProfileLoading] = useState(true);
-  //
-  const [listDeTai, setListDeTai] = useState<ICongBoKhoaHoc[]>([]);
-  const [tableLoading, setTableLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [totalItems, setTotalItems] = useState(0);
-  //
-  const [loadingBaiBaoCongBo, setloadingBaiBaoCongBo] = useState(true);
-  const [listBaiBaoCongBo, setListBaiBaoCongBo] = useState<IBaiBaoCongBo[]>([]);
-  const [currentPageBaiBao, setCurrentPageBaiBao] = useState(1);
-  const [pageSizeBaiBao, setPageSizeBaiBao] = useState(10);
-  const [totalItemsBaiBao, setTotalItemsBaiBao] = useState(0);
-  //
-  const [loadingGiaiThuongKHCN, setloadingGiaiThuongKHCN] = useState(true);
-  const [listGiaiThuongKHCN, setListGiaiThuongKHCN] = useState<
-    IGIaiThuongKHCN[]
-  >([]);
-  const [currentPageGiaiThuongKHCN, setCurrentPageGiaiThuongKHCN] = useState(1);
-  const [pageSizeGiaiThuongKHCN, setPageSizeGiaiThuongKHCN] = useState(10);
-  const [totalItemsGiaiThuongKHCN, setTotalItemsGiaiThuongKHCN] = useState(0);
-  //
-  const [loadingSachXB, setloadingSachXB] = useState(true);
-  const [listSachXB, setListSachXB] = useState<ISachXuatBan[]>([]);
-  const [currentPageSachXB, setCurrentPageSachXB] = useState(1);
-  const [pageSizeSachXB, setPageSizeSachXB] = useState(10);
-  const [totalItemsSachXB, setTotalItemsSachXB] = useState(0);
-  //
-  const [loadingTriTue, setloadingTriTue] = useState(true);
-  const [listTriTue, setListTriTue] = useState<ITriTue[]>([]);
-  const [currentPageTriTue, setCurrentPageTriTue] = useState(1);
-  const [pageSizeTriTue, setPageSizeTriTue] = useState(10);
-  const [totalItemsTriTue, setTotalItemsTriTue] = useState(0);
 
-  //
+  const deTai = usePagination();
+  const [listDeTai, setListDeTai] = useState<ICongBoKhoaHoc[]>([]);
+  const [loadingDeTai, setLoadingDeTai] = useState(true);
+
+  const baiBao = usePagination();
+  const [listBaiBaoCongBo, setListBaiBaoCongBo] = useState<IBaiBaoCongBo[]>([]);
+  const [loadingBaiBaoCongBo, setLoadingBaiBaoCongBo] = useState(true);
+
+  const giaiThuong = usePagination();
+  const [listGiaiThuongKHCN, setListGiaiThuongKHCN] = useState<IGIaiThuongKHCN[]>([]);
+  const [loadingGiaiThuongKHCN, setLoadingGiaiThuongKHCN] = useState(true);
+
+  const sachXB = usePagination();
+  const [listSachXB, setListSachXB] = useState<ISachXuatBan[]>([]);
+  const [loadingSachXB, setLoadingSachXB] = useState(true);
+
+  const triTue = usePagination();
+  const [listTriTue, setListTriTue] = useState<ITriTue[]>([]);
+  const [loadingTriTue, setLoadingTriTue] = useState(true);
+
   useEffect(() => {
     setProfileLoading(true);
     ProfileUserApi.getProfileById(mans)
-      .then((res) => {
-        setProfile(res.data);
-      })
+      .then((res) => setProfile(res.data))
       .catch((err) => console.error(err))
-      .finally(() => {
-        setProfileLoading(false);
-      });
+      .finally(() => setProfileLoading(false));
   }, [mans]);
 
-  //
   useEffect(() => {
-    setTableLoading(true);
-    ProfileUserApi.getListProfileCongBoKhoaHoc(pageSize, currentPage, mans)
+    setLoadingDeTai(true);
+    ProfileUserApi.getListProfileCongBoKhoaHoc(
+      deTai.tableProps.pageSize, deTai.tableProps.currentPage, mans
+    )
       .then((res) => {
         setListDeTai(res.data.items);
-        setTotalItems(res.data.totalItems);
+        deTai.setTotalItems(res.data.totalItems);
       })
       .catch((err) => console.error(err))
-      .finally(() => {
-        setTableLoading(false);
-      });
-  }, [currentPage, pageSize, mans]);
+      .finally(() => setLoadingDeTai(false));
+  }, [deTai.tableProps.currentPage, deTai.tableProps.pageSize, mans]);
 
-  //
   useEffect(() => {
-    setloadingBaiBaoCongBo(true);
-    ProfileUserApi.getListBaiBaoCongBoKhoaHoc(pageSize, currentPage, mans)
+    setLoadingBaiBaoCongBo(true);
+    ProfileUserApi.getListBaiBaoCongBoKhoaHoc(
+      baiBao.tableProps.pageSize, baiBao.tableProps.currentPage, mans
+    )
       .then((res) => {
         setListBaiBaoCongBo(res.data.items);
-        setTotalItemsBaiBao(res.data.totalItems);
+        baiBao.setTotalItems(res.data.totalItems);
       })
       .catch((err) => console.error(err))
-      .finally(() => {
-        setloadingBaiBaoCongBo(false);
-      });
-  }, [currentPageBaiBao, pageSizeBaiBao, mans]);
+      .finally(() => setLoadingBaiBaoCongBo(false));
+  }, [baiBao.tableProps.currentPage, baiBao.tableProps.pageSize, mans]);
 
-  //
   useEffect(() => {
-    setloadingGiaiThuongKHCN(true);
-    ProfileUserApi.getListGiaiThuongKHCN(pageSize, currentPage, mans)
+    setLoadingGiaiThuongKHCN(true);
+    ProfileUserApi.getListGiaiThuongKHCN(
+      giaiThuong.tableProps.pageSize, giaiThuong.tableProps.currentPage, mans
+    )
       .then((res) => {
         setListGiaiThuongKHCN(res.data.items);
-        setTotalItemsGiaiThuongKHCN(res.data.totalItems);
+        giaiThuong.setTotalItems(res.data.totalItems);
       })
       .catch((err) => console.error(err))
-      .finally(() => {
-        setloadingGiaiThuongKHCN(false);
-      });
-  }, [currentPageGiaiThuongKHCN, pageSizeGiaiThuongKHCN, mans]);
+      .finally(() => setLoadingGiaiThuongKHCN(false));
+  }, [giaiThuong.tableProps.currentPage, giaiThuong.tableProps.pageSize, mans]);
 
-  //
   useEffect(() => {
-    setloadingSachXB(true);
-    ProfileUserApi.getListSachXuatBan(pageSize, currentPage, mans)
+    setLoadingSachXB(true);
+    ProfileUserApi.getListSachXuatBan(
+      sachXB.tableProps.pageSize, sachXB.tableProps.currentPage, mans
+    )
       .then((res) => {
         setListSachXB(res.data.items);
-        setTotalItemsSachXB(res.data.totalItems);
+        sachXB.setTotalItems(res.data.totalItems);
       })
       .catch((err) => console.error(err))
-      .finally(() => {
-        setloadingSachXB(false);
-      });
-  }, [currentPageSachXB, pageSizeSachXB, mans]);
+      .finally(() => setLoadingSachXB(false));
+  }, [sachXB.tableProps.currentPage, sachXB.tableProps.pageSize, mans]);
 
-  //
   useEffect(() => {
-    setloadingTriTue(true);
-    ProfileUserApi.getListTriTue(pageSize, currentPage, mans)
+    setLoadingTriTue(true);
+    ProfileUserApi.getListTriTue(
+      triTue.tableProps.pageSize, triTue.tableProps.currentPage, mans
+    )
       .then((res) => {
         setListTriTue(res.data.items);
-        setTotalItemsTriTue(res.data.totalItems);
+        triTue.setTotalItems(res.data.totalItems);
       })
       .catch((err) => console.error(err))
-      .finally(() => {
-        setloadingTriTue(false);
-      });
-  }, [currentPageTriTue, pageSizeTriTue, mans]);
-
-  //
-  const totalPages = Math.ceil(totalItems / pageSize);
-  const startItem = totalItems > 0 ? (currentPage - 1) * pageSize + 1 : 0;
-  const endItem = Math.min(currentPage * pageSize, totalItems);
-  //
-  const totalPagesBaiBao = Math.ceil(totalItemsBaiBao / pageSizeBaiBao);
-  const startItemBaiBao =
-    totalItemsBaiBao > 0 ? (currentPageBaiBao - 1) * pageSizeBaiBao + 1 : 0;
-  const endItemBaiBao = Math.min(
-    currentPageBaiBao * pageSizeBaiBao,
-    totalItemsBaiBao,
-  );
-  //
-  const totalPagesGiaiThuongKHCN = Math.ceil(
-    totalItemsGiaiThuongKHCN / pageSizeGiaiThuongKHCN,
-  );
-  const startItemGiaiThuongKHCN =
-    totalItemsGiaiThuongKHCN > 0
-      ? (currentPageGiaiThuongKHCN - 1) * pageSizeGiaiThuongKHCN + 1
-      : 0;
-  const endItemGiaiThuongKHCN = Math.min(
-    currentPageGiaiThuongKHCN * pageSizeGiaiThuongKHCN,
-    totalItemsGiaiThuongKHCN,
-  );
-  //
-  const totalPagesSachXB = Math.ceil(totalItemsSachXB / pageSizeSachXB);
-  const startItemSachXB =
-    totalItemsSachXB > 0 ? (currentPageSachXB - 1) * pageSizeSachXB + 1 : 0;
-  const endItemSachXB = Math.min(
-    currentPageSachXB * pageSizeSachXB,
-    totalItemsSachXB,
-  );
-  //
-  const totalPagesTriTue = Math.ceil(totalItemsTriTue / pageSizeTriTue);
-  const startItemTriTue =
-    totalItemsTriTue > 0 ? (currentPageTriTue - 1) * pageSizeTriTue + 1 : 0;
-  const endItemTriTue = Math.min(
-    currentPageTriTue * pageSizeTriTue,
-    totalItemsTriTue,
-  );
+      .finally(() => setLoadingTriTue(false));
+  }, [triTue.tableProps.currentPage, triTue.tableProps.pageSize, mans]);
 
   return (
     <>
@@ -204,6 +164,8 @@ const CongBoKhoaHoc = ({ params }: DataIdProfile) => {
             avatar={profile?.anhDaiDien}
           />
           <TeacherSectionTitle label={"Quá trình nghiên cứu khoa học"} />
+
+          {/* 1. Hướng nghiên cứu chính */}
           <div className="border shadow-md">
             <div className="bg-secondaryBlue text-white font-myriad w-full py-3 px-5">
               1. Hướng nghiên cứu chính
@@ -212,9 +174,7 @@ const CongBoKhoaHoc = ({ params }: DataIdProfile) => {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[12px] font-bold">TT</TableHead>
-                  <TableHead className="font-bold text-center">
-                    Nội dung
-                  </TableHead>
+                  <TableHead className="font-bold text-center">Nội dung</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -224,418 +184,105 @@ const CongBoKhoaHoc = ({ params }: DataIdProfile) => {
               </TableBody>
             </Table>
           </div>
-           <div className="p-5"></div>
-          {/*1. Các dự án, nhiệm vụ KHCN - 5 */}
-          <div className="border shadow-md">
-            <div className="bg-secondaryBlue text-white font-myriad w-full py-3 px-5">
-              2. Các dự án, nhiệm vụ KHCN
-            </div>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[12px] font-bold">TT</TableHead>
-                  <TableHead className="font-bold text-center">
-                    Tên đề tài
-                  </TableHead>
-                  <TableHead className="font-bold text-center">
-                    Năm hoàn thành
-                  </TableHead>
-                  <TableHead className="font-bold text-center">
-                    Đề tài cấp
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {tableLoading ? (
-                  <TableSkeleton rows={pageSize} columns={4} />
-                ) : listDeTai.length > 0 ? (
-                  listDeTai.map((item, i) => (
-                    <TableRow key={`${item.tenDeTai}-${i}`}>
-                      <TableCell className="text-center">
-                        {(currentPage - 1) * pageSize + i + 1}
-                      </TableCell>
-                      <TableCell>
-                        <p>{item.tenDeTai}</p>
-                        <p>
-                          <span className="text-slate-400">Vai trò:</span>&nbsp;
-                          <span className="text-red-600">{item.tenVaiTro}</span>
-                        </p>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {item.ngayKetThuc?.split("-")[0]}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {item.tenDeTai}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center">
-                      <p>Không có dữ liệu</p>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-            {/* Pagination */}
-            {!tableLoading && totalItems > 0 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                pageSize={pageSize}
-                totalItems={totalItems}
-                startItem={startItem}
-                endItem={endItem}
-                onPageChange={setCurrentPage}
-                onPageSizeChange={setPageSize}
-              />
-            )}
-          </div>
-          {/*  */}
-          <div className="p-5"></div>
-          {/*2. Công bố khoa học trên tạp chí trong nước, quốc tế */}
-          <div className="border shadow-md">
-            <div className="bg-secondaryBlue text-white font-myriad w-full py-3 px-5">
-              3. Công bố khoa học trên tạp chí trong nước, quốc tế
-            </div>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[12px] font-bold">TT</TableHead>
-                  <TableHead className="font-bold text-center">
-                    Tên bài báo
-                  </TableHead>
-                  <TableHead className="font-bold text-center">
-                    Tên tạp chí
-                  </TableHead>
-                  <TableHead className="font-bold text-center">
-                    Ngày xuất bản
-                  </TableHead>
-                  <TableHead className="font-bold text-center">
-                    Số giờ quy đổi
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center">
-                    <p>Không có dữ liệu</p>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-            {/* Pagination */}
-            {!loadingBaiBaoCongBo && totalItemsBaiBao > 0 && (
-              <Pagination
-                currentPage={currentPageBaiBao}
-                totalPages={totalPagesBaiBao}
-                pageSize={pageSizeBaiBao}
-                totalItems={totalItemsBaiBao}
-                startItem={startItemBaiBao}
-                endItem={endItemBaiBao}
-                onPageChange={setCurrentPageBaiBao}
-                onPageSizeChange={setPageSizeBaiBao}
-              />
-            )}
-          </div>
-          {/*  */}
-          <div className="p-5"></div>
-          {/*3. Báo cáo khoa học tại hội nghị, hội thảo */}
-          <div className="border shadow-md">
-            <div className="bg-secondaryBlue text-white font-myriad w-full py-3 px-5">
-              4. Báo cáo khoa học tại hội nghị, hội thảo
-            </div>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[12px] font-bold">TT</TableHead>
-                  <TableHead className="font-bold text-center">
-                    Tên bài báo
-                  </TableHead>
-                  <TableHead className="font-bold text-center">
-                    Tên tạp chí
-                  </TableHead>
-                  <TableHead className="font-bold text-center">
-                    Ngày xuất bản
-                  </TableHead>
-                  <TableHead className="font-bold text-center">
-                    Số giờ quy đổi
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loadingBaiBaoCongBo ? (
-                  <TableSkeleton rows={pageSizeBaiBao} columns={5} />
-                ) : listBaiBaoCongBo.length > 0 ? (
-                  listBaiBaoCongBo.map((item, i) => (
-                    <TableRow key={`${item.tenBaiBao}-${i}`}>
-                      <TableCell className="text-center">
-                        {(currentPageBaiBao - 1) * pageSizeBaiBao + i + 1}
-                      </TableCell>
-                      <TableCell>
-                        <p>{item.tenBaiBao}</p>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {item.tenTapChi}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {item.ngayXuatBan?.split("-")[0]}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {item.soGioQuyDoi}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center">
-                      <p>Không có dữ liệu</p>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-            {/* Pagination */}
-            {!loadingBaiBaoCongBo && totalItemsBaiBao > 0 && (
-              <Pagination
-                currentPage={currentPageBaiBao}
-                totalPages={totalPagesBaiBao}
-                pageSize={pageSizeBaiBao}
-                totalItems={totalItemsBaiBao}
-                startItem={startItemBaiBao}
-                endItem={endItemBaiBao}
-                onPageChange={setCurrentPageBaiBao}
-                onPageSizeChange={setPageSizeBaiBao}
-              />
-            )}
-          </div>
-          {/*  */}
-          <div className="p-5"></div>
-          {/* 4. Sở hữu trí tuệ */}
-          <div className="border shadow-md">
-            <div className="bg-secondaryBlue text-white font-myriad w-full py-3 px-5">
-              5. Sở hữu trí tuệ
-            </div>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[12px] font-bold">TT</TableHead>
-                  <TableHead className="font-bold text-center">
-                    Tên tài sản trí tuệ
-                  </TableHead>
-                  <TableHead className="font-bold text-center">
-                    Số hiệu
-                  </TableHead>
-                  <TableHead className="font-bold text-center">
-                    Ngày cấp bằng
-                  </TableHead>
-                  <TableHead className="font-bold text-center">
-                    Số giờ quy đổi
-                  </TableHead>
-                  <TableHead className="font-bold text-center">
-                    Niên học
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loadingTriTue ? (
-                  <TableSkeleton rows={pageSizeTriTue} columns={6} />
-                ) : listTriTue.length > 0 ? (
-                  listTriTue.map((item, i) => (
-                    <TableRow key={`${item.tenTaiSanTriTue}-${i}`}>
-                      <TableCell className="text-center">
-                        {(currentPageTriTue - 1) * pageSizeTriTue + i + 1}
-                      </TableCell>
-                      <TableCell>
-                        <p>{item.tenTaiSanTriTue}</p>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {item.soHieu}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {item.ngayCapBang?.split("-")[0]}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {item.soGioQuyDoi}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {item.nienHoc}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center">
-                      <p>Không có dữ liệu</p>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-            {/* Pagination */}
-            {!loadingTriTue && totalItemsTriTue > 0 && (
-              <Pagination
-                currentPage={currentPageTriTue}
-                totalPages={totalPagesTriTue}
-                pageSize={pageSizeTriTue}
-                totalItems={totalItemsTriTue}
-                startItem={startItemTriTue}
-                endItem={endItemTriTue}
-                onPageChange={setCurrentPageTriTue}
-                onPageSizeChange={setPageSizeTriTue}
-              />
-            )}
-          </div>
-          {/*  */}
-          <div className="p-5"></div>
-          {/* Sách xuất bản */}
-          <div className="border shadow-md">
-            <div className="bg-secondaryBlue text-white font-myriad w-full py-3 px-5">
-              6. Sách xuất bản
-            </div>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[12px] font-bold">TT</TableHead>
-                  <TableHead className="font-bold text-center">Tên</TableHead>
-                  <TableHead className="font-bold text-center">
-                    Nhà xuất bản
-                  </TableHead>
-                  <TableHead className="font-bold text-center">
-                    Ngày xuất bản
-                  </TableHead>
-                  <TableHead className="font-bold text-center">
-                    Số giờ quy đổi
-                  </TableHead>
-                  <TableHead className="font-bold text-center">
-                    Niên học
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loadingSachXB ? (
-                  <TableSkeleton rows={pageSizeSachXB} columns={6} />
-                ) : listSachXB.length > 0 ? (
-                  listSachXB.map((item, i) => (
-                    <TableRow key={`${item.ten}-${i}`}>
-                      <TableCell className="text-center">
-                        {(currentPageSachXB - 1) * pageSizeSachXB + i + 1}
-                      </TableCell>
-                      <TableCell>
-                        <p>{item.ten}</p>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {item.nhaXuatBan}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {item.ngayXuatBan?.split("-")[0]}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {item.soGioQuyDoi}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {item.nienHoc}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center">
-                      <p>Không có dữ liệu</p>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-            {/* Pagination */}
-            {!loadingSachXB && totalItemsSachXB > 0 && (
-              <Pagination
-                currentPage={currentPageSachXB}
-                totalPages={totalPagesSachXB}
-                pageSize={pageSizeSachXB}
-                totalItems={totalItemsSachXB}
-                startItem={startItemSachXB}
-                endItem={endItemSachXB}
-                onPageChange={setCurrentPageSachXB}
-                onPageSizeChange={setPageSizeSachXB}
-              />
-            )}
-          </div>
-          {/*  */}
-          <div className="p-5"></div>
-          {/* Giải thưởng khoa học công nghệ */}
-          <div className="border shadow-md">
-            <div className="bg-secondaryBlue text-white font-myriad w-full py-3 px-5">
-              7. Giải thưởng khoa học công nghệ
-            </div>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[12px] font-bold">TT</TableHead>
-                  <TableHead className="font-bold text-center">
-                    Tên giải thưởng
-                  </TableHead>
-                  <TableHead className="font-bold text-center">
-                    Tên công trình
-                  </TableHead>
-                  <TableHead className="font-bold text-center">
-                    Ngày xuất bản
-                  </TableHead>
-                  <TableHead className="font-bold text-center">
-                    Số giờ quy đổi
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loadingGiaiThuongKHCN ? (
-                  <TableSkeleton rows={pageSizeGiaiThuongKHCN} columns={5} />
-                ) : listGiaiThuongKHCN.length > 0 ? (
-                  listGiaiThuongKHCN.map((item, i) => (
-                    <TableRow key={`${item.tenGiaiThuong}-${i}`}>
-                      <TableCell className="text-center">
-                        {(currentPageGiaiThuongKHCN - 1) *
-                          pageSizeGiaiThuongKHCN +
-                          i +
-                          1}
-                      </TableCell>
-                      <TableCell>
-                        <p>{item.tenGiaiThuong}</p>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {item.tenGiaiThuong}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {item.ngayCap?.split("-")[0]}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {item.soGioQuyDoi}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center">
-                      <p>Không có dữ liệu</p>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-            {/* Pagination */}
-            {!loadingGiaiThuongKHCN && totalItemsGiaiThuongKHCN > 0 && (
-              <Pagination
-                currentPage={currentPageGiaiThuongKHCN}
-                totalPages={totalPagesGiaiThuongKHCN}
-                pageSize={pageSizeGiaiThuongKHCN}
-                totalItems={totalItemsGiaiThuongKHCN}
-                startItem={startItemGiaiThuongKHCN}
-                endItem={endItemGiaiThuongKHCN}
-                onPageChange={setCurrentPageGiaiThuongKHCN}
-                onPageSizeChange={setPageSizeGiaiThuongKHCN}
-              />
-            )}
-          </div>          
+
+          <div className="p-5" />
+
+          {/* 2. Các dự án, nhiệm vụ KHCN */}
+          <DataTable<ICongBoKhoaHoc>
+            title="2. Các dự án, nhiệm vụ KHCN"
+            columns={[
+              { label: "Tên đề tài", field: "tenDeTai" },
+              { label: "Năm hoàn thành", field: "ngayKetThuc", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
+              { label: "Lĩnh vực", field: "tenLinhVuc", cellClass: "text-center" },
+            ]}
+            data={listDeTai}
+            loading={loadingDeTai}
+            {...deTai.tableProps}
+          />
+
+          <div className="p-5" />
+
+          {/* 3. Công bố khoa học trên tạp chí trong nước, quốc tế */}
+          <DataTable<IBaiBaoCongBo>
+            title="3. Công bố khoa học trên tạp chí trong nước, quốc tế"
+            columns={[
+              { label: "Tên bài báo", field: "tenBaiBao" },
+              { label: "Tên tạp chí", field: "tenTapChi", cellClass: "text-center" },
+              { label: "Ngày xuất bản", field: "ngayXuatBan", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
+              { label: "Số giờ quy đổi", field: "soGioQuyDoi", cellClass: "text-center" },
+            ]}
+            data={[]}
+            loading={false}
+            {...baiBao.tableProps}
+          />
+
+          <div className="p-5" />
+
+          {/* 4. Báo cáo khoa học tại hội nghị, hội thảo */}
+          <DataTable<IBaiBaoCongBo>
+            title="4. Báo cáo khoa học tại hội nghị, hội thảo"
+            columns={[
+              { label: "Tên bài báo", field: "tenBaiBao" },
+              { label: "Tên tạp chí", field: "tenTapChi", cellClass: "text-center" },
+              { label: "Ngày xuất bản", field: "ngayXuatBan", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
+              { label: "Số giờ quy đổi", field: "soGioQuyDoi", cellClass: "text-center" },
+            ]}
+            data={listBaiBaoCongBo}
+            loading={loadingBaiBaoCongBo}
+            {...baiBao.tableProps}
+          />
+
+          <div className="p-5" />
+
+          {/* 5. Sở hữu trí tuệ */}
+          <DataTable<ITriTue>
+            title="5. Sở hữu trí tuệ"
+            columns={[
+              { label: "Tên tài sản trí tuệ", field: "tenTaiSanTriTue" },
+              { label: "Số hiệu", field: "soHieu", cellClass: "text-center" },
+              { label: "Ngày cấp bằng", field: "ngayCapBang", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
+              { label: "Số giờ quy đổi", field: "soGioQuyDoi", cellClass: "text-center" },
+              { label: "Niên học", field: "nienHoc", cellClass: "text-center" },
+            ]}
+            data={listTriTue}
+            loading={loadingTriTue}
+            {...triTue.tableProps}
+          />
+
+          <div className="p-5" />
+
+          {/* 6. Sách xuất bản */}
+          <DataTable<ISachXuatBan>
+            title="6. Sách xuất bản"
+            columns={[
+              { label: "Tên", field: "ten" },
+              { label: "Nhà xuất bản", field: "nhaXuatBan", cellClass: "text-center" },
+              { label: "Ngày xuất bản", field: "ngayXuatBan", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
+              { label: "Số giờ quy đổi", field: "soGioQuyDoi", cellClass: "text-center" },
+              { label: "Niên học", field: "nienHoc", cellClass: "text-center" },
+            ]}
+            data={listSachXB}
+            loading={loadingSachXB}
+            {...sachXB.tableProps}
+          />
+
+          <div className="p-5" />
+
+          {/* 7. Giải thưởng khoa học công nghệ */}
+          <DataTable<IGIaiThuongKHCN>
+            title="7. Giải thưởng khoa học công nghệ"
+            columns={[
+              { label: "Tên giải thưởng", field: "tenGiaiThuong" },
+              { label: "Tên công trình", field: "tenCongTrinh", cellClass: "text-center" },
+              { label: "Ngày cấp", field: "ngayCap", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
+              { label: "Số giờ quy đổi", field: "soGioQuyDoi", cellClass: "text-center" },
+            ]}
+            data={listGiaiThuongKHCN}
+            loading={loadingGiaiThuongKHCN}
+            {...giaiThuong.tableProps}
+          />
+
+          <div className="p-5" />
         </div>
       )}
     </>
