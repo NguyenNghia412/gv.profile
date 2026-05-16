@@ -22,6 +22,36 @@ axiosClient.interceptors.request.use(async (config) => {
     return config;
 });
 
-axiosClient.interceptors.response.use((res) => res.data);
+let isRefreshing = false;
+
+axiosClient.interceptors.response.use(
+    (res) => res.data,
+    async (error) => {
+        const originalRequest = error.config;
+
+        if (error.response?.status === 401 && !originalRequest._retry && !isRefreshing) {
+            originalRequest._retry = true;
+            isRefreshing = true;
+
+            try {
+                const refreshRes = await fetch("/api/auth/refresh");
+                if (!refreshRes.ok) return Promise.reject(error);
+
+                const session: any = await getSession();
+                if (session?.access_token) {
+                    originalRequest.headers.Authorization = `Bearer ${session.access_token}`;
+                }
+
+                return axiosClient(originalRequest);
+            } catch {
+                return Promise.reject(error);
+            } finally {
+                isRefreshing = false;
+            }
+        }
+
+        return Promise.reject(error);
+    }
+);
 
 export default axiosClient;

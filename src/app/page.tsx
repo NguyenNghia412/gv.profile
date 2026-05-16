@@ -74,7 +74,6 @@ export default function Home() {
                                     <TableCell>
                                         <Link
                                             href={`/teacher/thong-tin-chung/${item.mans}`}
-                                            target="_blank"
                                             className="text-blue-600 hover:text-blue-800 underline"
                                         >
                                             Xem chi tiết
@@ -83,7 +82,6 @@ export default function Home() {
                                     <TableCell>
                                         <Link
                                             href={`/teacher/cong-bo-khoa-hoc/${item.mans}`}
-                                            target="_blank"
                                             className="text-blue-600 hover:text-blue-800 underline"
                                         >
                                             Xem chi tiết
