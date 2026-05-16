@@ -62,3 +62,12 @@ All TypeScript interfaces are in `src/models/`:
 - Do not write custom style if tailwind already cover it
 - Use shadcn components as most as possible
 - Do not create new theme color
+
+### Brand colors
+| Token | Value | Dùng cho |
+|---|---|---|
+| `primaryBlue` | `#001e42` | Màu nền chính, header |
+| `secondaryBlue` | `#002a5c` | Thanh tiêu đề của các section/bảng |
+
+### Font
+- `font-myriad` — `myriadpro-semibold`, dùng cho tiêu đề section

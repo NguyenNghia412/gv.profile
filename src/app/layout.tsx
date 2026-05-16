@@ -21,10 +21,10 @@ export default function RootLayout({
         <PublicEnvScript />
       </head>
       <body className={``}>
-        <div className="bg-white min-h-screen max-h-screen">
+        <div className="bg-white min-h-screen flex flex-col">
           <Providers>
             <Header />
-            <div className="container mx-auto p-3">{children}</div>
+            <main className="flex-1 container mx-auto p-3">{children}</main>
             <Footer />
           </Providers>
         </div>
