@@ -29,8 +29,7 @@ All data fetching calls go through this client. Server-side calls use `getServer
 
 ### Page Structure
 - `/` — paginated teacher list table
-- `/teacher/thong-tin-chung/[mans]` — teacher general info (profile, education history, work history)
-- `/teacher/cong-bo-khoa-hoc/[mans]` — scientific publications (5 categories, each paginated)
+- `/teacher/ly-lich-khoa-hoc/[mans]` — "Lý lịch khoa học": single page combining teacher general info on top (profile, education history, work history) and scientific publications below (each category a paginated `DataTable`)
 
 The `[mans]` segment is the teacher's employee ID.
 

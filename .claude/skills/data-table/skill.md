@@ -1,9 +1,9 @@
 ---
 name: data-table
-description: Hướng dẫn sử dụng DataTable component để render bảng dữ liệu có phân trang trong dự án này.
+description: Hướng dẫn sử dụng DataTable component để render bảng dữ liệu (có hoặc không phân trang) trong dự án này.
 ---
 
-Khi cần render một bảng dữ liệu có phân trang, dùng component `DataTable` tại `@/components/pages/data-table`.
+Khi cần render một bảng dữ liệu (có hoặc không phân trang), dùng component `DataTable` tại `@/components/pages/data-table`.
 
 ## Import
 
@@ -15,19 +15,22 @@ import { DataTable, CELL_VIEW_TYPES } from "@/components/pages/data-table";
 
 | Prop | Type | Default | Mô tả |
 |---|---|---|---|
-| `title` | `string` | — | Tiêu đề thanh xanh phía trên bảng |
+| `title` | `string?` | — | Tiêu đề thanh xanh phía trên bảng |
+| `hideTitle` | `boolean?` | `false` | Ẩn thanh tiêu đề (dùng khi trang đã có section title riêng) |
 | `columns` | `Column<T>[]` | — | Định nghĩa cột |
 | `data` | `T[]` | — | Mảng dữ liệu |
-| `loading` | `boolean` | — | Hiện skeleton khi `true` |
-| `showStt` | `boolean` | `true` | Hiện cột TT (số thứ tự) đầu bảng |
-| `currentPage` | `number` | — | |
-| `totalPages` | `number` | — | |
-| `pageSize` | `number` | — | |
-| `totalItems` | `number` | — | |
-| `startItem` | `number` | — | |
-| `endItem` | `number` | — | |
-| `onPageChange` | `(page: number) => void` | — | |
-| `onPageSizeChange` | `(size: number) => void` | — | |
+| `loading` | `boolean?` | `false` | Hiện skeleton khi `true` |
+| `showStt` | `boolean?` | `true` | Hiện cột TT (số thứ tự) đầu bảng |
+| `currentPage` | `number?` | `1` | |
+| `totalPages` | `number?` | `1` | |
+| `pageSize` | `number?` | `10` | Cũng là số dòng skeleton khi loading |
+| `totalItems` | `number?` | `0` | |
+| `startItem` | `number?` | `0` | |
+| `endItem` | `number?` | `0` | |
+| `onPageChange` | `((page: number) => void)?` | — | |
+| `onPageSizeChange` | `((size: number) => void)?` | — | |
+
+Các prop phân trang đều tùy chọn. Pagination chỉ render khi có cả `onPageChange` và `onPageSizeChange`, `totalItems > 0` và không loading.
 
 ## Props của Column<T>
 
@@ -112,6 +115,25 @@ useEffect(() => {
   {...sachXB.tableProps}
 />
 ```
+
+## Bảng không phân trang, ẩn tiêu đề
+
+Dùng cho bảng hiển thị toàn bộ dữ liệu một lần (vd. Quá trình đào tạo / công tác ở `ly-lich-khoa-hoc`), tiêu đề do `TeacherSectionTitle` bên ngoài đảm nhiệm:
+
+```tsx
+<DataTable<IViewRowQuaTrinhDaoTao>
+  hideTitle
+  showStt={false}
+  data={data ?? []}
+  columns={[
+    { label: "Nơi đào tạo", field: "noiDaoTao", className: "font-bold" },
+    { label: "Ngành đào tạo", field: "nganhDaoTao", className: "font-bold" },
+    { label: "Năm", field: "nam", className: "font-bold" },
+  ]}
+/>
+```
+
+Không truyền prop phân trang nào → không hiện Pagination.
 
 ## Lưu ý
 

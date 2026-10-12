@@ -53,8 +53,7 @@ export default function Home() {
                             <TableHead className="font-bold">Giảng viên</TableHead>
                             <TableHead className="font-bold">Đơn vị</TableHead>
                             <TableHead className="font-bold">Cơ sở khoa học</TableHead>
-                            <TableHead className="font-bold">Thông tin chi tiết</TableHead>
-                            <TableHead className="font-bold">Công bố khoa học</TableHead>
+                            <TableHead className="font-bold">Lý lịch khoa học</TableHead>
                         </TableRow>
                     </TableHeader>
 
@@ -73,15 +72,7 @@ export default function Home() {
                                     <TableCell>{item.coSoKhoaHoc}</TableCell>
                                     <TableCell>
                                         <Link
-                                            href={`/teacher/thong-tin-chung/${item.mans}`}
-                                            className="text-blue-600 hover:text-blue-800 underline"
-                                        >
-                                            Xem chi tiết
-                                        </Link>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Link
-                                            href={`/teacher/cong-bo-khoa-hoc/${item.mans}`}
+                                            href={`/teacher/ly-lich-khoa-hoc/${item.mans}`}
                                             className="text-blue-600 hover:text-blue-800 underline"
                                         >
                                             Xem chi tiết

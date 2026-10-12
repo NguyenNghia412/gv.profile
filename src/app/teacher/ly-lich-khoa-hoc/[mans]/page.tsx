@@ -1,6 +1,8 @@
 "use client";
 import { ProfileUserApi } from "@/app/services/profile_user";
 import { CELL_VIEW_TYPES, DataTable } from "@/components/pages/data-table";
+import LoginToView from "@/components/pages/login-to-view";
+import TeacherItemInfo from "@/components/pages/teacher/teacher-item-info";
 import TeacherNameBlock from "@/components/pages/teacher/teacher-name-block";
 import TeacherSectionTitle from "@/components/pages/teacher/teacher-section-title";
 import Loading from "@/components/ui/loading";
@@ -19,8 +21,20 @@ import {
   IGIaiThuongKHCN,
   ISachXuatBan,
   ITriTue,
+  IViewRowQuaTrinhCongTac,
+  IViewRowQuaTrinhDaoTao,
 } from "@/models/profile.model";
+import {
+  LocateFixed,
+  Mail,
+  MapPin,
+  MapPinned,
+  Phone,
+  VenusAndMars,
+} from "lucide-react";
 import { useEffect, useState } from "react";
+import QuaTrinhCongTac from "./qua-trinh-cong-tac";
+import QuaTrinhDaoTao from "./qua-trinh-dao-tao";
 
 interface DataIdProfile {
   params: {
@@ -52,10 +66,16 @@ function usePagination(initialPageSize = 10) {
   };
 }
 
-const CongBoKhoaHoc = ({ params }: DataIdProfile) => {
+const LyLichKhoaHoc = ({ params }: DataIdProfile) => {
   const { mans } = params;
   const [profile, setProfile] = useState<IDetailProfile>();
   const [profileLoading, setProfileLoading] = useState(true);
+
+  const [quaTrinhDaoTao, setQuaTrinhDaoTao] = useState<IViewRowQuaTrinhDaoTao[]>([]);
+  const [loadingQuaTrinhDaoTao, setLoadingQuaTrinhDaoTao] = useState(true);
+
+  const [quaTrinhCongTac, setQuaTrinhCongTac] = useState<IViewRowQuaTrinhCongTac[]>([]);
+  const [loadingQuaTrinhCongTac, setLoadingQuaTrinhCongTac] = useState(true);
 
   const deTai = usePagination();
   const [listDeTai, setListDeTai] = useState<ICongBoKhoaHoc[]>([]);
@@ -83,6 +103,18 @@ const CongBoKhoaHoc = ({ params }: DataIdProfile) => {
       .then((res) => setProfile(res.data))
       .catch((err) => console.error(err))
       .finally(() => setProfileLoading(false));
+
+    setLoadingQuaTrinhDaoTao(true);
+    ProfileUserApi.getQuaTrinhDaoTao(mans)
+      .then((res) => setQuaTrinhDaoTao(res.data))
+      .catch((err) => console.error(err))
+      .finally(() => setLoadingQuaTrinhDaoTao(false));
+
+    setLoadingQuaTrinhCongTac(true);
+    ProfileUserApi.getQuaTrinhCongTac(mans)
+      .then((res) => setQuaTrinhCongTac(res.data))
+      .catch((err) => console.error(err))
+      .finally(() => setLoadingQuaTrinhCongTac(false));
   }, [mans]);
 
   useEffect(() => {
@@ -163,6 +195,39 @@ const CongBoKhoaHoc = ({ params }: DataIdProfile) => {
             hocHam={profile?.tenChucVu ?? ""}
             avatar={profile?.anhDaiDien}
           />
+
+          {/* ===== Thông tin chung ===== */}
+          <TeacherSectionTitle label={"Lý lịch sơ lược"} />
+          <div className="grid grid-cols-2 gap-2 text-slate-600">
+            <div className="border shadow-md">
+              <TeacherItemInfo icon={VenusAndMars} label="Giới tính" value={profile?.gioiTinh ? "Nam" : "Nữ"} />
+              <hr />
+              <TeacherItemInfo icon={MapPin} label="Tỉnh/Thành phố" value={profile?.noiSinh} />
+              <hr />
+              <TeacherItemInfo icon={Mail} label="Email" value={profile?.email} />
+            </div>
+            <div className="border shadow-md">
+              <TeacherItemInfo icon={MapPinned} label="Cơ sở" value="Hà Nội" />
+              <hr />
+              <TeacherItemInfo icon={LocateFixed} label="Đơn vị" value={profile?.tenPhongBan} />
+              <hr />
+              <TeacherItemInfo icon={Phone} label="Điện thoại" isNeedLogin={false} value={profile?.soDienThoai} />
+            </div>
+          </div>
+
+          <TeacherSectionTitle label={"Quá trình đào tạo"} />
+          <LoginToView>
+            <QuaTrinhDaoTao data={quaTrinhDaoTao} loading={loadingQuaTrinhDaoTao} />
+          </LoginToView>
+
+          <h3 className="my-8 font-semibold text-3xl text-slate-600">
+            Quá trình công tác chuyên môn
+          </h3>
+          <LoginToView>
+            <QuaTrinhCongTac data={quaTrinhCongTac} loading={loadingQuaTrinhCongTac} />
+          </LoginToView>
+
+          {/* ===== Công bố khoa học ===== */}
           <TeacherSectionTitle label={"Quá trình nghiên cứu khoa học"} />
 
           {/* 1. Hướng nghiên cứu chính */}
@@ -224,8 +289,8 @@ const CongBoKhoaHoc = ({ params }: DataIdProfile) => {
             columns={[
               { label: "Tên bài báo", field: "tenBaiBao" },
               { label: "Tên tạp chí", field: "tenTapChi", cellClass: "text-center" },
-              { label: "Ngày xuất bản", field: "ngayXuatBan", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
-              { label: "Số giờ quy đổi", field: "soGioQuyDoi", cellClass: "text-center" },
+            //   { label: "Ngày xuất bản", field: "ngayXuatBan", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
+            //   { label: "Số giờ quy đổi", field: "soGioQuyDoi", cellClass: "text-center" },
             ]}
             data={listBaiBaoCongBo}
             loading={loadingBaiBaoCongBo}
@@ -241,8 +306,8 @@ const CongBoKhoaHoc = ({ params }: DataIdProfile) => {
               { label: "Tên tài sản trí tuệ", field: "tenTaiSanTriTue" },
               { label: "Số hiệu", field: "soHieu", cellClass: "text-center" },
               { label: "Ngày cấp bằng", field: "ngayCapBang", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
-              { label: "Số giờ quy đổi", field: "soGioQuyDoi", cellClass: "text-center" },
-              { label: "Niên học", field: "nienHoc", cellClass: "text-center" },
+            //   { label: "Số giờ quy đổi", field: "soGioQuyDoi", cellClass: "text-center" },
+            //   { label: "Niên học", field: "nienHoc", cellClass: "text-center" },
             ]}
             data={listTriTue}
             loading={loadingTriTue}
@@ -258,8 +323,8 @@ const CongBoKhoaHoc = ({ params }: DataIdProfile) => {
               { label: "Tên", field: "ten" },
               { label: "Nhà xuất bản", field: "nhaXuatBan", cellClass: "text-center" },
               { label: "Ngày xuất bản", field: "ngayXuatBan", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
-              { label: "Số giờ quy đổi", field: "soGioQuyDoi", cellClass: "text-center" },
-              { label: "Niên học", field: "nienHoc", cellClass: "text-center" },
+            //   { label: "Số giờ quy đổi", field: "soGioQuyDoi", cellClass: "text-center" },
+            //   { label: "Niên học", field: "nienHoc", cellClass: "text-center" },
             ]}
             data={listSachXB}
             loading={loadingSachXB}
@@ -274,8 +339,8 @@ const CongBoKhoaHoc = ({ params }: DataIdProfile) => {
             columns={[
               { label: "Tên giải thưởng", field: "tenGiaiThuong" },
               { label: "Tên công trình", field: "tenCongTrinh", cellClass: "text-center" },
-              { label: "Ngày cấp", field: "ngayCap", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
-              { label: "Số giờ quy đổi", field: "soGioQuyDoi", cellClass: "text-center" },
+            //   { label: "Ngày cấp", field: "ngayCap", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
+            //   { label: "Số giờ quy đổi", field: "soGioQuyDoi", cellClass: "text-center" },
             ]}
             data={listGiaiThuongKHCN}
             loading={loadingGiaiThuongKHCN}
@@ -289,4 +354,4 @@ const CongBoKhoaHoc = ({ params }: DataIdProfile) => {
   );
 };
 
-export default CongBoKhoaHoc;
+export default LyLichKhoaHoc;

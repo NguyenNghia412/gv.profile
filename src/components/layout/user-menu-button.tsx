@@ -28,13 +28,8 @@ const UserMenuButton = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-secondaryBlue border-slate-700">
                 <DropdownMenuItem className="!text-white cursor-pointer !hover:text-white hover:underline">
-                    <Link href={`/teacher/thong-tin-chung/${currentMans}`} className="w-full h-full">
-                        Thông tin chung
-                    </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="!text-white cursor-pointer !hover:text-white hover:underline">
-                    <Link href={`/teacher/cong-bo-khoa-hoc/${currentMans}`} className="w-full h-full">
-                        Công bố khoa học
+                    <Link href={`/teacher/ly-lich-khoa-hoc/${currentMans}`} className="w-full h-full">
+                        Lý lịch khoa học
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-slate-700" />

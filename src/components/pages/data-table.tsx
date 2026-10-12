@@ -47,33 +47,35 @@ interface Column<T> {
 }
 
 interface DataTableProps<T extends object> {
-    title: string;
+    title?: string;
+    hideTitle?: boolean;
     columns: Column<T>[];
     data: T[];
-    loading: boolean;
+    loading?: boolean;
     showStt?: boolean;
-    currentPage: number;
-    totalPages: number;
-    pageSize: number;
-    totalItems: number;
-    startItem: number;
-    endItem: number;
-    onPageChange: (page: number) => void;
-    onPageSizeChange: (size: number) => void;
+    currentPage?: number;
+    totalPages?: number;
+    pageSize?: number;
+    totalItems?: number;
+    startItem?: number;
+    endItem?: number;
+    onPageChange?: (page: number) => void;
+    onPageSizeChange?: (size: number) => void;
 }
 
 export function DataTable<T extends object>({
     title,
+    hideTitle = false,
     columns,
     data,
-    loading,
+    loading = false,
     showStt = true,
-    currentPage,
-    totalPages,
-    pageSize,
-    totalItems,
-    startItem,
-    endItem,
+    currentPage = 1,
+    totalPages = 1,
+    pageSize = 10,
+    totalItems = 0,
+    startItem = 0,
+    endItem = 0,
     onPageChange,
     onPageSizeChange,
 }: DataTableProps<T>) {
@@ -81,9 +83,11 @@ export function DataTable<T extends object>({
 
     return (
         <div className="border shadow-md">
-            <div className="bg-secondaryBlue text-white font-myriad w-full py-3 px-5">
-                {title}
-            </div>
+            {!hideTitle && (
+                <div className="bg-secondaryBlue text-white font-myriad w-full py-3 px-5">
+                    {title}
+                </div>
+            )}
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -126,7 +130,7 @@ export function DataTable<T extends object>({
                     )}
                 </TableBody>
             </Table>
-            {!loading && totalItems > 0 && (
+            {!loading && totalItems > 0 && onPageChange && onPageSizeChange && (
                 <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}
