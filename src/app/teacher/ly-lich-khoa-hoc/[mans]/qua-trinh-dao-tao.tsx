@@ -7,17 +7,40 @@ interface QuaTrinhDaoTaoProps {
     data: IViewRowQuaTrinhDaoTao[];
 }
 
+type QuaTrinhDaoTaoRow = IViewRowQuaTrinhDaoTao & { thoiGian: string };
+
+function getYear(value?: string | null): string {
+    if (!value) return "";
+    const date = new Date(value);
+    return isNaN(date.getTime()) ? "" : String(date.getFullYear());
+}
+
+function formatThoiGian(item: IViewRowQuaTrinhDaoTao): string {
+    const batDau = getYear(item.thoiGianBatDau);
+    const ketThuc = getYear(item.thoiGianKetThuc);
+
+    if (!batDau && !ketThuc) return "";
+    if (!batDau) return ketThuc;
+    if (ketThuc) return `${batDau}-${ketThuc}`;
+    return item.namTotNghiep != null ? `${batDau}-${item.namTotNghiep}` : batDau;
+}
+
 const QuaTrinhDaoTao: React.FC<QuaTrinhDaoTaoProps> = ({ data, loading }) => {
+    const rows: QuaTrinhDaoTaoRow[] = (data ?? []).map((item) => ({
+        ...item,
+        thoiGian: formatThoiGian(item),
+    }));
+
     return (
         <DataTable
             hideTitle
-            showStt={false}
-            data={data ?? []}
+            data={rows}
             loading={loading}
             columns={[
-                { label: "Nơi đào tạo", field: "noiDaoTao", className: "font-bold" },
-                { label: "Ngành đào tạo", field: "nganhDaoTao", className: "font-bold" },
-                { label: "Năm", field: "nam", className: "font-bold" },
+                { label: "Thời gian", field: "thoiGian", className: "font-bold" },
+                { label: "Tên cơ sở đào tạo", field: "noiDaoTao", className: "font-bold" },
+                { label: "Chuyên ngành", field: "chuyenMon", className: "font-bold" },
+                { label: "Học vị", field: "tenHocVi", className: "font-bold" },
             ]}
         />
     );

@@ -89,9 +89,12 @@ export interface ITriTue {
 }
 
 export interface IViewRowQuaTrinhDaoTao {
-  noiDaoTao?: string;
-  nganhDaoTao?: string;
-  nam?: string;
+  noiDaoTao?: string | null;
+  chuyenMon?: string | null;
+  thoiGianBatDau?: string | null;
+  thoiGianKetThuc?: string | null;
+  namTotNghiep?: number | null;
+  tenHocVi?: string | null;
 }
 
 export interface IViewRowQuaTrinhCongTac {
