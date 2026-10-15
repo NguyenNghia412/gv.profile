@@ -79,13 +79,14 @@ export interface ISachXuatBan {
 }
 
 export interface ITriTue {
-  id?: string;
-  tenTaiSanTriTue?: string;
-  soHieu?: string;
-  ngayCapBang?: string;
-  ngayTao?: string;
-  soGioQuyDoi?: string;
-  nienHoc?: string;
+  id?: number | null;
+  tenTaiSanTriTue?: string | null;
+  soHieu?: string | null;
+  ngayCapBang?: string | null;
+  ngayTao?: string | null;
+  soGioQuyDoi?: number | null;
+  nienHoc?: string | null;
+  thanhPhanThamGia?: string | null;
 }
 
 export interface IViewRowQuaTrinhDaoTao {

@@ -303,8 +303,9 @@ const LyLichKhoaHoc = ({ params }: DataIdProfile) => {
           <DataTable<ITriTue>
             title="5. Sở hữu trí tuệ"
             columns={[
-              { label: "Tên tài sản trí tuệ", field: "tenTaiSanTriTue" },
-              { label: "Số hiệu", field: "soHieu", cellClass: "text-center" },
+              { label: "Tên và nội dung văn bằng", field: "tenTaiSanTriTue" },
+              { label: "Tác giả", field: "thanhPhanThamGia" },
+              { label: "Số bằng", field: "soHieu", cellClass: "text-center" },
               { label: "Ngày cấp bằng", field: "ngayCapBang", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
             //   { label: "Số giờ quy đổi", field: "soGioQuyDoi", cellClass: "text-center" },
             //   { label: "Niên học", field: "nienHoc", cellClass: "text-center" },
