@@ -1,5 +1,6 @@
 "use client";
 
+import { Fragment } from "react";
 import { TableSkeleton } from "@/components/ui/loading";
 import { Pagination } from "@/components/ui/pagination";
 import {
@@ -15,6 +16,7 @@ export const CELL_VIEW_TYPES = {
     TEXT: "TEXT",
     DATE: "DATE",
     DATETIME: "DATETIME",
+    YEAR: "YEAR",
 } as const;
 
 type CellViewType = typeof CELL_VIEW_TYPES[keyof typeof CELL_VIEW_TYPES];
@@ -30,6 +32,7 @@ function formatCellValue(value: unknown, viewType: CellViewType): React.ReactNod
     const mm = String(date.getMonth() + 1).padStart(2, "0");
     const yyyy = date.getFullYear();
 
+    if (viewType === CELL_VIEW_TYPES.YEAR) return String(yyyy);
     if (viewType === CELL_VIEW_TYPES.DATE) return `${dd}/${mm}/${yyyy}`;
 
     const HH = String(date.getHours()).padStart(2, "0");
@@ -46,11 +49,17 @@ interface Column<T> {
     viewType?: CellViewType;
 }
 
+export interface DataTableGroup<T> {
+    title: string;
+    data: T[];
+}
+
 interface DataTableProps<T extends object> {
     title?: string;
     hideTitle?: boolean;
     columns: Column<T>[];
-    data: T[];
+    data?: T[];
+    groups?: DataTableGroup<T>[];
     loading?: boolean;
     showStt?: boolean;
     currentPage?: number;
@@ -67,7 +76,8 @@ export function DataTable<T extends object>({
     title,
     hideTitle = false,
     columns,
-    data,
+    data = [],
+    groups,
     loading = false,
     showStt = true,
     currentPage = 1,
@@ -80,6 +90,22 @@ export function DataTable<T extends object>({
     onPageSizeChange,
 }: DataTableProps<T>) {
     const colCount = columns.length + (showStt ? 1 : 0);
+
+    const renderRows = (rows: T[], sttOffset: number) =>
+        rows.map((item, i) => (
+            <TableRow key={i}>
+                {showStt && (
+                    <TableCell className="text-center">{sttOffset + i + 1}</TableCell>
+                )}
+                {columns.map((col, j) => (
+                    <TableCell key={j} className={col.cellClass}>
+                        {col.field != null
+                            ? formatCellValue(item[col.field], col.viewType ?? CELL_VIEW_TYPES.TEXT)
+                            : ""}
+                    </TableCell>
+                ))}
+            </TableRow>
+        ));
 
     return (
         <div className="border shadow-md">
@@ -104,23 +130,27 @@ export function DataTable<T extends object>({
                 <TableBody>
                     {loading ? (
                         <TableSkeleton rows={pageSize} columns={colCount} />
-                    ) : data.length > 0 ? (
-                        data.map((item, i) => (
-                            <TableRow key={i}>
-                                {showStt && (
-                                    <TableCell className="text-center">
-                                        {(currentPage - 1) * pageSize + i + 1}
+                    ) : groups ? (
+                        groups.map((group, g) => (
+                            <Fragment key={g}>
+                                <TableRow className="bg-slate-100 hover:bg-slate-100">
+                                    <TableCell colSpan={colCount} className="font-bold">
+                                        {group.title}
                                     </TableCell>
+                                </TableRow>
+                                {group.data.length > 0 ? (
+                                    renderRows(group.data, 0)
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={colCount} className="text-center">
+                                            <p>Không có dữ liệu</p>
+                                        </TableCell>
+                                    </TableRow>
                                 )}
-                                {columns.map((col, j) => (
-                                    <TableCell key={j} className={col.cellClass}>
-                                        {col.field != null
-                                            ? formatCellValue(item[col.field], col.viewType ?? CELL_VIEW_TYPES.TEXT)
-                                            : ""}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
+                            </Fragment>
                         ))
+                    ) : data.length > 0 ? (
+                        renderRows(data, (currentPage - 1) * pageSize)
                     ) : (
                         <TableRow>
                             <TableCell colSpan={colCount} className="text-center">

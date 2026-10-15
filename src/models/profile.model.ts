@@ -54,11 +54,20 @@ export interface ICongBoKhoaHoc {
 }
 
 export interface IBaiBaoCongBo {
-  id?: string;
-  tenBaiBao?: string;
-  tenTapChi?: string;
-  ngayXuatBan?: string;
-  soGioQuyDoi?: number;
+  id?: number | null;
+  tenTacGia?: string | null;
+  tenBaiBao?: string | null;
+  tenTapChi?: string | null;
+  ngayXuatBan?: string | null;
+  idTheLoai?: number | null;
+}
+
+export interface IBaiBaoCongBoGroup {
+  isi?: IBaiBaoCongBo[];
+  scopus?: IBaiBaoCongBo[];
+  quocTeKhac?: IBaiBaoCongBo[];
+  hdgsnn?: IBaiBaoCongBo[];
+  khac?: IBaiBaoCongBo[];
 }
 
 export interface IGIaiThuongKHCN {

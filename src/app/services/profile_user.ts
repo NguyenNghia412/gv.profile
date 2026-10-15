@@ -3,7 +3,7 @@ import {
     ResponseBaseModel,
 } from "@/models/response.models";
 import axiosClient from "./api_services";
-import { IBaiBaoCongBo, ICongBoKhoaHoc, IDetailProfile, IGIaiThuongKHCN, IProfile, ISachXuatBan, ITriTue, IViewRowQuaTrinhCongTac, IViewRowQuaTrinhDaoTao } from "@/models/profile.model";
+import { IBaiBaoCongBoGroup, ICongBoKhoaHoc, IDetailProfile, IGIaiThuongKHCN, IProfile, ISachXuatBan, ITriTue, IViewRowQuaTrinhCongTac, IViewRowQuaTrinhDaoTao } from "@/models/profile.model";
 
 export const ProfileUserApi = {
 
@@ -23,10 +23,8 @@ export const ProfileUserApi = {
         );
     },
 
-    getListBaiBaoCongBoKhoaHoc(pageSize: number, pageNumber: number, id: string): Promise<ResponseBaseApiModel<IBaiBaoCongBo[]>> {
-        return axiosClient.get(
-            `api/core/khcn/gv/cong-bo-kh/bai-bao?mans=${id}&pageSize=${pageSize}&pageNumber=${pageNumber}`
-        );
+    getListBaiBaoCongBoKhoaHoc(id: string): Promise<ResponseBaseModel<IBaiBaoCongBoGroup>> {
+        return axiosClient.get(`api/core/khcn/gv/cong-bo-kh/bai-bao?mans=${id}`);
     },
 
     getListGiaiThuongKHCN(pageSize: number, pageNumber: number, id: string): Promise<ResponseBaseApiModel<IGIaiThuongKHCN[]>> {

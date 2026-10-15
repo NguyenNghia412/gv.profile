@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/table";
 import {
   IBaiBaoCongBo,
+  IBaiBaoCongBoGroup,
   ICongBoKhoaHoc,
   IDetailProfile,
   IGIaiThuongKHCN,
@@ -81,8 +82,7 @@ const LyLichKhoaHoc = ({ params }: DataIdProfile) => {
   const [listDeTai, setListDeTai] = useState<ICongBoKhoaHoc[]>([]);
   const [loadingDeTai, setLoadingDeTai] = useState(true);
 
-  const baiBao = usePagination();
-  const [listBaiBaoCongBo, setListBaiBaoCongBo] = useState<IBaiBaoCongBo[]>([]);
+  const [baiBaoCongBo, setBaiBaoCongBo] = useState<IBaiBaoCongBoGroup>({});
   const [loadingBaiBaoCongBo, setLoadingBaiBaoCongBo] = useState(true);
 
   const giaiThuong = usePagination();
@@ -132,16 +132,11 @@ const LyLichKhoaHoc = ({ params }: DataIdProfile) => {
 
   useEffect(() => {
     setLoadingBaiBaoCongBo(true);
-    ProfileUserApi.getListBaiBaoCongBoKhoaHoc(
-      baiBao.tableProps.pageSize, baiBao.tableProps.currentPage, mans
-    )
-      .then((res) => {
-        setListBaiBaoCongBo(res.data.items);
-        baiBao.setTotalItems(res.data.totalItems);
-      })
+    ProfileUserApi.getListBaiBaoCongBoKhoaHoc(mans)
+      .then((res) => setBaiBaoCongBo(res.data ?? {}))
       .catch((err) => console.error(err))
       .finally(() => setLoadingBaiBaoCongBo(false));
-  }, [baiBao.tableProps.currentPage, baiBao.tableProps.pageSize, mans]);
+  }, [mans]);
 
   useEffect(() => {
     setLoadingGiaiThuongKHCN(true);
@@ -272,13 +267,18 @@ const LyLichKhoaHoc = ({ params }: DataIdProfile) => {
             title="3. Công bố khoa học trên tạp chí trong nước, quốc tế"
             columns={[
               { label: "Tên bài báo", field: "tenBaiBao" },
-              { label: "Tên tạp chí", field: "tenTapChi", cellClass: "text-center" },
-              { label: "Ngày xuất bản", field: "ngayXuatBan", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
-              { label: "Số giờ quy đổi", field: "soGioQuyDoi", cellClass: "text-center" },
+              { label: "Tên các tác giả", field: "tenTacGia" },
+              { label: "Tên tạp chí/hội thảo, số, tập, trang, số ISSN, số DOI, chỉ số H Index", field: "tenTapChi" },
+              { label: "Năm công bố", field: "ngayXuatBan", cellClass: "text-center", viewType: CELL_VIEW_TYPES.YEAR },
             ]}
-            data={[]}
-            loading={false}
-            {...baiBao.tableProps}
+            groups={[
+              { title: "3.1. Bài báo quốc tế thuộc danh mục ISI", data: baiBaoCongBo.isi ?? [] },
+              { title: "3.2. Bài báo quốc tế thuộc danh mục Scopus", data: baiBaoCongBo.scopus ?? [] },
+              { title: "3.3. Bài báo tạp chí, hội thảo quốc tế khác", data: baiBaoCongBo.quocTeKhac ?? [] },
+              { title: "3.4. Bài báo trên tạp chí khoa học trong nước thuộc danh mục HDGSNN", data: baiBaoCongBo.hdgsnn ?? [] },
+              { title: "3.5. Bài báo tạp chí, hội thảo khoa học khác", data: baiBaoCongBo.khac ?? [] },
+            ]}
+            loading={loadingBaiBaoCongBo}
           />
 
           <div className="p-5" />
@@ -292,9 +292,8 @@ const LyLichKhoaHoc = ({ params }: DataIdProfile) => {
             //   { label: "Ngày xuất bản", field: "ngayXuatBan", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
             //   { label: "Số giờ quy đổi", field: "soGioQuyDoi", cellClass: "text-center" },
             ]}
-            data={listBaiBaoCongBo}
-            loading={loadingBaiBaoCongBo}
-            {...baiBao.tableProps}
+            data={[]}
+            loading={false}
           />
 
           <div className="p-5" />
