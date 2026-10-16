@@ -291,6 +291,56 @@ const LyLichKhoaHoc = ({ params }: DataIdProfile) => {
         />
       ),
     },
+    {
+      title: "Các thông tin về chỉ số nghiên cứu",
+      render: (no) => {
+        const chiSo = profile?.chiSoNghienCuu;
+        const items = [
+          {
+            label: "Chỉ số định danh ORCID",
+            rows: [
+              { label: "Mã số tài khoản", value: chiSo?.orcidAccount },
+              { label: "Link", value: chiSo?.linkOrcidAccount, isLink: true },
+            ],
+          },
+          {
+            label: "Hồ sơ Google scholar",
+            rows: [
+              { label: "Tên tài khoản", value: chiSo?.gScholarAccount },
+              { label: "Link", value: chiSo?.linkGScholarAccount, isLink: true },
+            ],
+          },
+        ];
+        return (
+          <div className="border shadow-md">
+            <div className="bg-secondaryBlue text-white font-myriad w-full py-3 px-5">
+              {no}. Các thông tin về chỉ số nghiên cứu
+            </div>
+            <ul className="px-5 py-3 space-y-3 text-sm text-slate-600">
+              {items.map((item) => (
+                <li key={item.label}>
+                  <p className="font-bold">- {item.label}:</p>
+                  <ul className="pl-6 mt-1 space-y-1">
+                    {item.rows.map((row) => (
+                      <li key={row.label}>
+                        + {row.label}:{" "}
+                        {row.value && row.isLink ? (
+                          <a href={row.value} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline break-all">
+                            {row.value}
+                          </a>
+                        ) : (
+                          row.value
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      },
+    },
   ];
 
   return (

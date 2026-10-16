@@ -21,6 +21,14 @@ export interface IDetailProfile {
   tenChucVu?: string;
   tenPhongBan?: string;
   anhDaiDien?: string;
+  chiSoNghienCuu?: IChiSoNghienCuu | null;
+}
+
+export interface IChiSoNghienCuu {
+  orcidAccount?: string | null;
+  linkOrcidAccount?: string | null;
+  gScholarAccount?: string | null;
+  linkGScholarAccount?: string | null;
 }
 
 export interface ICongBoKhoaHoc {
