@@ -7,10 +7,10 @@ import { IBaiBaoCongBoGroup, ICongBoKhoaHoc, IDetailProfile, IGIaiThuongKHCN, IP
 
 export const ProfileUserApi = {
 
-    getListProfile(pageSize: number, pageNumber: number): Promise<ResponseBaseApiModel<IProfile[]>> {
-        return axiosClient.get(
-            `/api/core/khcn/gv/thong-tin-chung?pageSize=${pageSize}&pageNumber=${pageNumber}`
-        );
+    getListProfile(pageSize: number, pageNumber: number, keyword = ""): Promise<ResponseBaseApiModel<IProfile[]>> {
+        return axiosClient.get(`/api/core/khcn/gv/thong-tin-chung`, {
+            params: { pageSize, pageNumber, keyword: keyword || undefined },
+        });
     },
 
     getProfileById(id: any): Promise<ResponseBaseModel<IDetailProfile>> {

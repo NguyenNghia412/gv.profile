@@ -14,6 +14,9 @@ import { useEffect, useState } from "react";
 import { ProfileUserApi } from "./services/profile_user";
 import { TableSkeleton } from "@/components/ui/loading";
 import { Pagination } from "@/components/ui/pagination";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 
 console.log('env', process.env)
 
@@ -23,10 +26,18 @@ export default function Home() {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(25);
     const [totalItems, setTotalItems] = useState(0);
+    const [keywordInput, setKeywordInput] = useState("");
+    const [keyword, setKeyword] = useState("");
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        setKeyword(keywordInput.trim());
+        setCurrentPage(1);
+    };
 
     useEffect(() => {
         setLoading(true);
-        ProfileUserApi.getListProfile(pageSize, currentPage)
+        ProfileUserApi.getListProfile(pageSize, currentPage, keyword)
             .then(res => {
                 setDataUser(res.data.items)
                 setTotalItems(res.data.totalItems)
@@ -36,7 +47,7 @@ export default function Home() {
                 console.log(totalItems)
                 setLoading(false)
             })
-    }, [currentPage, pageSize])
+    }, [currentPage, pageSize, keyword])
 
     const totalPages = Math.ceil(totalItems / pageSize);
     const startItem = totalItems > 0 ? (currentPage - 1) * pageSize + 1 : 0;
@@ -44,6 +55,18 @@ export default function Home() {
 
     return (
         <div className="container mx-auto py-6 px-4">
+            <form onSubmit={handleSearch} className="flex gap-2 mb-4">
+                <Input
+                    value={keywordInput}
+                    onChange={(e) => setKeywordInput(e.target.value)}
+                    placeholder="Nhập từ khóa tìm kiếm..."
+                    className="max-w-md bg-white border-gray-300"
+                />
+                <Button type="submit" className="bg-primaryBlue hover:bg-secondaryBlue text-white">
+                    <Search />
+                    Tìm kiếm
+                </Button>
+            </form>
             <div className="bg-white rounded-lg shadow border">
                 <Table>
                     <TableCaption>Danh sách các giảng viên hiện tại</TableCaption>
