@@ -27,10 +27,8 @@ export const ProfileUserApi = {
         return axiosClient.get(`api/core/khcn/gv/cong-bo-kh/bai-bao?mans=${id}`);
     },
 
-    getListGiaiThuongKHCN(pageSize: number, pageNumber: number, id: string): Promise<ResponseBaseApiModel<IGIaiThuongKHCN[]>> {
-        return axiosClient.get(
-            `api/core/khcn/gv/cong-bo-kh/giai-thuong?mans=${id}&pageSize=${pageSize}&pageNumber=${pageNumber}`
-        );
+    getListGiaiThuongKHCN(id: string): Promise<ResponseBaseModel<IGIaiThuongKHCN[]>> {
+        return axiosClient.get(`api/core/khcn/gv/cong-bo-kh/giai-thuong?mans=${id}`);
     },
 
     getListSachXuatBan(pageSize: number, pageNumber: number, id: string): Promise<ResponseBaseApiModel<ISachXuatBan[]>> {

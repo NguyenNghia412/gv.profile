@@ -85,7 +85,6 @@ const LyLichKhoaHoc = ({ params }: DataIdProfile) => {
   const [baiBaoCongBo, setBaiBaoCongBo] = useState<IBaiBaoCongBoGroup>({});
   const [loadingBaiBaoCongBo, setLoadingBaiBaoCongBo] = useState(true);
 
-  const giaiThuong = usePagination();
   const [listGiaiThuongKHCN, setListGiaiThuongKHCN] = useState<IGIaiThuongKHCN[]>([]);
   const [loadingGiaiThuongKHCN, setLoadingGiaiThuongKHCN] = useState(true);
 
@@ -140,16 +139,11 @@ const LyLichKhoaHoc = ({ params }: DataIdProfile) => {
 
   useEffect(() => {
     setLoadingGiaiThuongKHCN(true);
-    ProfileUserApi.getListGiaiThuongKHCN(
-      giaiThuong.tableProps.pageSize, giaiThuong.tableProps.currentPage, mans
-    )
-      .then((res) => {
-        setListGiaiThuongKHCN(res.data.items);
-        giaiThuong.setTotalItems(res.data.totalItems);
-      })
+    ProfileUserApi.getListGiaiThuongKHCN(mans)
+      .then((res) => setListGiaiThuongKHCN(res.data ?? []))
       .catch((err) => console.error(err))
       .finally(() => setLoadingGiaiThuongKHCN(false));
-  }, [giaiThuong.tableProps.currentPage, giaiThuong.tableProps.pageSize, mans]);
+  }, [mans]);
 
   useEffect(() => {
     setLoadingSachXB(true);
@@ -337,14 +331,13 @@ const LyLichKhoaHoc = ({ params }: DataIdProfile) => {
           <DataTable<IGIaiThuongKHCN>
             title="7. Giải thưởng khoa học công nghệ"
             columns={[
-              { label: "Tên giải thưởng", field: "tenGiaiThuong" },
-              { label: "Tên công trình", field: "tenCongTrinh", cellClass: "text-center" },
-            //   { label: "Ngày cấp", field: "ngayCap", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
-            //   { label: "Số giờ quy đổi", field: "soGioQuyDoi", cellClass: "text-center" },
+              { label: "Tên giải thưởng, tên công trình", field: "tenGiaiThuong" },
+              { label: "Thứ hạng", field: "thuHang", cellClass: "text-center" },
+              { label: "Năm tặng thưởng", field: "ngayCap", cellClass: "text-center", viewType: CELL_VIEW_TYPES.YEAR },
+              { label: "Mô tả", field: "moTa", className: "font-bold text-center w-1/4", cellClass: "w-1/4 break-words" },
             ]}
             data={listGiaiThuongKHCN}
             loading={loadingGiaiThuongKHCN}
-            {...giaiThuong.tableProps}
           />
 
           <div className="p-5" />

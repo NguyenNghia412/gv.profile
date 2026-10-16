@@ -71,11 +71,13 @@ export interface IBaiBaoCongBoGroup {
 }
 
 export interface IGIaiThuongKHCN {
-  id?: string;
-  tenGiaiThuong?: string;
-  tenCongTrinh?: string;
-  ngayCap?: string;
-  soGioQuyDoi?: number;
+  id: number;
+  tenGiaiThuong?: string | null;
+  tenCongTrinh?: string | null;
+  thuHang?: string | null;
+  idThuHang?: number | null;
+  ngayCap?: string | null;
+  moTa?: string | null;
 }
 
 export interface ISachXuatBan {
