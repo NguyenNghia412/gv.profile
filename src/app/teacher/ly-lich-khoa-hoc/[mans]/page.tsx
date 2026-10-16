@@ -33,7 +33,7 @@ import {
   Phone,
   VenusAndMars,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Fragment, ReactNode, useEffect, useState } from "react";
 import QuaTrinhCongTac from "./qua-trinh-cong-tac";
 import QuaTrinhDaoTao from "./qua-trinh-dao-tao";
 
@@ -67,6 +67,8 @@ function usePagination(initialPageSize = 10) {
   };
 }
 
+type SachXuatBanRow = ISachXuatBan & { loaiSach: string };
+
 const LyLichKhoaHoc = ({ params }: DataIdProfile) => {
   const { mans } = params;
   const [profile, setProfile] = useState<IDetailProfile>();
@@ -88,8 +90,8 @@ const LyLichKhoaHoc = ({ params }: DataIdProfile) => {
   const [listGiaiThuongKHCN, setListGiaiThuongKHCN] = useState<IGIaiThuongKHCN[]>([]);
   const [loadingGiaiThuongKHCN, setLoadingGiaiThuongKHCN] = useState(true);
 
-  const sachXB = usePagination();
-  const [listSachXB, setListSachXB] = useState<ISachXuatBan[]>([]);
+  const sachXB = usePagination(50);
+  const [listSachXB, setListSachXB] = useState<SachXuatBanRow[]>([]);
   const [loadingSachXB, setLoadingSachXB] = useState(true);
 
   const triTue = usePagination();
@@ -151,7 +153,12 @@ const LyLichKhoaHoc = ({ params }: DataIdProfile) => {
       sachXB.tableProps.pageSize, sachXB.tableProps.currentPage, mans
     )
       .then((res) => {
-        setListSachXB(res.data.items);
+        setListSachXB(
+          (res.data.items ?? []).map((item) => ({
+            ...item,
+            loaiSach: [item.tenNhomTheLoai, item.chiSoISBN].filter(Boolean).join(", "),
+          }))
+        );
         sachXB.setTotalItems(res.data.totalItems);
       })
       .catch((err) => console.error(err))
@@ -170,6 +177,121 @@ const LyLichKhoaHoc = ({ params }: DataIdProfile) => {
       .catch((err) => console.error(err))
       .finally(() => setLoadingTriTue(false));
   }, [triTue.tableProps.currentPage, triTue.tableProps.pageSize, mans]);
+
+  // Số thứ tự các bảng được đánh tự động theo vị trí trong mảng
+  const researchSections: { title: string; render: (no: number) => ReactNode }[] = [
+    {
+      title: "Hướng nghiên cứu chính",
+      render: (no) => (
+        <div className="border shadow-md">
+          <div className="bg-secondaryBlue text-white font-myriad w-full py-3 px-5">
+            {no}. Hướng nghiên cứu chính
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[12px] font-bold">TT</TableHead>
+                <TableHead className="font-bold text-center">Nội dung</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableCell colSpan={2} className="text-center">
+                <p>Không có dữ liệu</p>
+              </TableCell>
+            </TableBody>
+          </Table>
+        </div>
+      ),
+    },
+    {
+      title: "Các dự án, nhiệm vụ KHCN",
+      render: (no) => (
+        <DataTable<ICongBoKhoaHoc>
+          title={`${no}. Các dự án, nhiệm vụ KHCN`}
+          columns={[
+            { label: "Tên đề tài", field: "tenDeTai" },
+            { label: "Năm hoàn thành", field: "ngayKetThuc", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
+            { label: "Lĩnh vực", field: "tenLinhVuc", cellClass: "text-center" },
+          ]}
+          data={listDeTai}
+          loading={loadingDeTai}
+          {...deTai.tableProps}
+        />
+      ),
+    },
+    {
+      title: "Công bố khoa học trên tạp chí trong nước, quốc tế",
+      render: (no) => (
+        <DataTable<IBaiBaoCongBo>
+          title={`${no}. Công bố khoa học trên tạp chí trong nước, quốc tế`}
+          columns={[
+            { label: "Tên bài báo", field: "tenBaiBao" },
+            { label: "Tên các tác giả", field: "tenTacGia" },
+            { label: "Tên tạp chí/hội thảo, số, tập, trang, số ISSN, số DOI, chỉ số H Index", field: "tenTapChi" },
+            { label: "Năm công bố", field: "ngayXuatBan", cellClass: "text-center", viewType: CELL_VIEW_TYPES.YEAR },
+          ]}
+          groups={[
+            { title: "Bài báo quốc tế thuộc danh mục ISI", data: baiBaoCongBo.isi ?? [] },
+            { title: "Bài báo quốc tế thuộc danh mục Scopus", data: baiBaoCongBo.scopus ?? [] },
+            { title: "Bài báo tạp chí, hội thảo quốc tế khác", data: baiBaoCongBo.quocTeKhac ?? [] },
+            { title: "Bài báo trên tạp chí khoa học trong nước thuộc danh mục HDGSNN", data: baiBaoCongBo.hdgsnn ?? [] },
+            { title: "Bài báo tạp chí, hội thảo khoa học khác", data: baiBaoCongBo.khac ?? [] },
+          ].map((group, j) => ({ ...group, title: `${no}.${j + 1}. ${group.title}` }))}
+          loading={loadingBaiBaoCongBo}
+        />
+      ),
+    },
+    {
+      title: "Sở hữu trí tuệ",
+      render: (no) => (
+        <DataTable<ITriTue>
+          title={`${no}. Sở hữu trí tuệ`}
+          columns={[
+            { label: "Tên và nội dung văn bằng", field: "tenTaiSanTriTue" },
+            { label: "Tác giả", field: "thanhPhanThamGia" },
+            { label: "Số bằng", field: "soHieu", cellClass: "text-center" },
+            { label: "Ngày cấp bằng", field: "ngayCapBang", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
+          ]}
+          data={listTriTue}
+          loading={loadingTriTue}
+          {...triTue.tableProps}
+        />
+      ),
+    },
+    {
+      title: "Sách xuất bản",
+      render: (no) => (
+        <DataTable<SachXuatBanRow>
+          title={`${no}. Sách xuất bản`}
+          columns={[
+            { label: "Tên sách", field: "ten" },
+            { label: "Nhà xuất bản", field: "nhaXuatBan", cellClass: "text-center" },
+            { label: "Tên các tác giả", field: "dsThanhPhanThamGia" },
+            { label: "Loại sách", field: "loaiSach" },
+          ]}
+          data={listSachXB}
+          loading={loadingSachXB}
+          {...sachXB.tableProps}
+        />
+      ),
+    },
+    {
+      title: "Giải thưởng khoa học công nghệ",
+      render: (no) => (
+        <DataTable<IGIaiThuongKHCN>
+          title={`${no}. Giải thưởng khoa học công nghệ`}
+          columns={[
+            { label: "Tên giải thưởng, tên công trình", field: "tenGiaiThuong" },
+            { label: "Thứ hạng", field: "thuHang", cellClass: "text-center" },
+            { label: "Năm tặng thưởng", field: "ngayCap", cellClass: "text-center", viewType: CELL_VIEW_TYPES.YEAR },
+            { label: "Mô tả", field: "moTa", className: "font-bold text-center w-1/4", cellClass: "w-1/4 break-words" },
+          ]}
+          data={listGiaiThuongKHCN}
+          loading={loadingGiaiThuongKHCN}
+        />
+      ),
+    },
+  ];
 
   return (
     <>
@@ -219,128 +341,12 @@ const LyLichKhoaHoc = ({ params }: DataIdProfile) => {
           {/* ===== Công bố khoa học ===== */}
           <TeacherSectionTitle label={"Quá trình nghiên cứu khoa học"} />
 
-          {/* 1. Hướng nghiên cứu chính */}
-          <div className="border shadow-md">
-            <div className="bg-secondaryBlue text-white font-myriad w-full py-3 px-5">
-              1. Hướng nghiên cứu chính
-            </div>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[12px] font-bold">TT</TableHead>
-                  <TableHead className="font-bold text-center">Nội dung</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableCell colSpan={2} className="text-center">
-                  <p>Không có dữ liệu</p>
-                </TableCell>
-              </TableBody>
-            </Table>
-          </div>
-
-          <div className="p-5" />
-
-          {/* 2. Các dự án, nhiệm vụ KHCN */}
-          <DataTable<ICongBoKhoaHoc>
-            title="2. Các dự án, nhiệm vụ KHCN"
-            columns={[
-              { label: "Tên đề tài", field: "tenDeTai" },
-              { label: "Năm hoàn thành", field: "ngayKetThuc", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
-              { label: "Lĩnh vực", field: "tenLinhVuc", cellClass: "text-center" },
-            ]}
-            data={listDeTai}
-            loading={loadingDeTai}
-            {...deTai.tableProps}
-          />
-
-          <div className="p-5" />
-
-          {/* 3. Công bố khoa học trên tạp chí trong nước, quốc tế */}
-          <DataTable<IBaiBaoCongBo>
-            title="3. Công bố khoa học trên tạp chí trong nước, quốc tế"
-            columns={[
-              { label: "Tên bài báo", field: "tenBaiBao" },
-              { label: "Tên các tác giả", field: "tenTacGia" },
-              { label: "Tên tạp chí/hội thảo, số, tập, trang, số ISSN, số DOI, chỉ số H Index", field: "tenTapChi" },
-              { label: "Năm công bố", field: "ngayXuatBan", cellClass: "text-center", viewType: CELL_VIEW_TYPES.YEAR },
-            ]}
-            groups={[
-              { title: "3.1. Bài báo quốc tế thuộc danh mục ISI", data: baiBaoCongBo.isi ?? [] },
-              { title: "3.2. Bài báo quốc tế thuộc danh mục Scopus", data: baiBaoCongBo.scopus ?? [] },
-              { title: "3.3. Bài báo tạp chí, hội thảo quốc tế khác", data: baiBaoCongBo.quocTeKhac ?? [] },
-              { title: "3.4. Bài báo trên tạp chí khoa học trong nước thuộc danh mục HDGSNN", data: baiBaoCongBo.hdgsnn ?? [] },
-              { title: "3.5. Bài báo tạp chí, hội thảo khoa học khác", data: baiBaoCongBo.khac ?? [] },
-            ]}
-            loading={loadingBaiBaoCongBo}
-          />
-
-          <div className="p-5" />
-
-          {/* 4. Báo cáo khoa học tại hội nghị, hội thảo */}
-          <DataTable<IBaiBaoCongBo>
-            title="4. Báo cáo khoa học tại hội nghị, hội thảo"
-            columns={[
-              { label: "Tên bài báo", field: "tenBaiBao" },
-              { label: "Tên tạp chí", field: "tenTapChi", cellClass: "text-center" },
-            //   { label: "Ngày xuất bản", field: "ngayXuatBan", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
-            //   { label: "Số giờ quy đổi", field: "soGioQuyDoi", cellClass: "text-center" },
-            ]}
-            data={[]}
-            loading={false}
-          />
-
-          <div className="p-5" />
-
-          {/* 5. Sở hữu trí tuệ */}
-          <DataTable<ITriTue>
-            title="5. Sở hữu trí tuệ"
-            columns={[
-              { label: "Tên và nội dung văn bằng", field: "tenTaiSanTriTue" },
-              { label: "Tác giả", field: "thanhPhanThamGia" },
-              { label: "Số bằng", field: "soHieu", cellClass: "text-center" },
-              { label: "Ngày cấp bằng", field: "ngayCapBang", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
-            //   { label: "Số giờ quy đổi", field: "soGioQuyDoi", cellClass: "text-center" },
-            //   { label: "Niên học", field: "nienHoc", cellClass: "text-center" },
-            ]}
-            data={listTriTue}
-            loading={loadingTriTue}
-            {...triTue.tableProps}
-          />
-
-          <div className="p-5" />
-
-          {/* 6. Sách xuất bản */}
-          <DataTable<ISachXuatBan>
-            title="6. Sách xuất bản"
-            columns={[
-              { label: "Tên", field: "ten" },
-              { label: "Nhà xuất bản", field: "nhaXuatBan", cellClass: "text-center" },
-              { label: "Ngày xuất bản", field: "ngayXuatBan", cellClass: "text-center", viewType: CELL_VIEW_TYPES.DATE },
-            //   { label: "Số giờ quy đổi", field: "soGioQuyDoi", cellClass: "text-center" },
-            //   { label: "Niên học", field: "nienHoc", cellClass: "text-center" },
-            ]}
-            data={listSachXB}
-            loading={loadingSachXB}
-            {...sachXB.tableProps}
-          />
-
-          <div className="p-5" />
-
-          {/* 7. Giải thưởng khoa học công nghệ */}
-          <DataTable<IGIaiThuongKHCN>
-            title="7. Giải thưởng khoa học công nghệ"
-            columns={[
-              { label: "Tên giải thưởng, tên công trình", field: "tenGiaiThuong" },
-              { label: "Thứ hạng", field: "thuHang", cellClass: "text-center" },
-              { label: "Năm tặng thưởng", field: "ngayCap", cellClass: "text-center", viewType: CELL_VIEW_TYPES.YEAR },
-              { label: "Mô tả", field: "moTa", className: "font-bold text-center w-1/4", cellClass: "w-1/4 break-words" },
-            ]}
-            data={listGiaiThuongKHCN}
-            loading={loadingGiaiThuongKHCN}
-          />
-
-          <div className="p-5" />
+          {researchSections.map((section, i) => (
+            <Fragment key={section.title}>
+              {section.render(i + 1)}
+              <div className="p-5" />
+            </Fragment>
+          ))}
         </div>
       )}
     </>

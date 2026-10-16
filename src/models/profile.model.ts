@@ -81,12 +81,12 @@ export interface IGIaiThuongKHCN {
 }
 
 export interface ISachXuatBan {
-  id?: string;
-  ten?: string;
-  nhaXuatBan?: string;
-  ngayXuatBan?: string;
-  soGioQuyDoi?: number;
-  nienHoc?: string;
+  id?: number | null;
+  ten?: string | null;
+  nhaXuatBan?: string | null;
+  tenNhomTheLoai?: string | null;
+  chiSoISBN?: string | null;
+  dsThanhPhanThamGia?: string | null;
 }
 
 export interface ITriTue {
