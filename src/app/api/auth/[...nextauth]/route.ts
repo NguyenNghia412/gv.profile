@@ -82,6 +82,9 @@ const handler = NextAuth({
     },
   ],
 
+  // Phải trùng với secret dùng ở getToken/encode trong /api/auth/refresh
+  secret: process.env.NEXTAUTH_SECRET,
+
   session: {
     strategy: "jwt", // store session in cookie (default good choice)
   },
@@ -89,8 +92,7 @@ const handler = NextAuth({
   callbacks: {
     async jwt({ token, account }) {
       // Runs when login happens
-      if (account) {
-        token.access_token = account.access_token;
+      if (account) {        token.access_token = account.access_token;
         token.refresh_token = account.refresh_token;
         token.id_token = account.id_token;
       }
