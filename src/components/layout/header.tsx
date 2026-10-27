@@ -8,6 +8,8 @@ import {
 } from "../ui/navigation-menu";
 import Link from "next/link";
 import { menus } from "@/constants/menu";
+import UserMenuButton from "./user-menu-button";
+
 
 const Header = () => {
   return (
@@ -43,7 +45,7 @@ const Header = () => {
         </div>
       </header>
       <div className="bg-[#001e42]">
-        <div className="container mx-auto p-2 text-white">
+        <div className="container mx-auto p-2 text-white flex justify-between items-center">
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
@@ -62,6 +64,7 @@ const Header = () => {
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
+          <UserMenuButton />
         </div>
       </div>
     </>

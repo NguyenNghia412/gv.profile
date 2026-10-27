@@ -1,0 +1,53 @@
+import {
+    ResponseBaseApiModel,
+    ResponseBaseModel,
+} from "@/models/response.models";
+import axiosClient from "./api_services";
+import { IBaiBaoCongBoGroup, ICongBoKhoaHoc, IDetailProfile, IGIaiThuongKHCN, IProfile, ISachXuatBan, ITriTue, IViewRowQuaTrinhCongTac, IViewRowQuaTrinhDaoTao } from "@/models/profile.model";
+
+export const ProfileUserApi = {
+
+    getListProfile(pageSize: number, pageNumber: number, keyword = ""): Promise<ResponseBaseApiModel<IProfile[]>> {
+        return axiosClient.get(`/api/core/khcn/gv/thong-tin-chung`, {
+            params: { pageSize, pageNumber, keyword: keyword || undefined },
+        });
+    },
+
+    getProfileById(id: any): Promise<ResponseBaseModel<IDetailProfile>> {
+        return axiosClient.get(`/api/core/khcn/gv/thong-tin-chung/${id}`);
+    },
+
+    getListProfileCongBoKhoaHoc(pageSize: number, pageNumber: number, id: string): Promise<ResponseBaseApiModel<ICongBoKhoaHoc[]>> {
+        return axiosClient.get(
+            `/api/core/khcn/gv/cong-bo-kh/de-tai?mans=${id}&pageSize=${pageSize}&pageNumber=${pageNumber}`
+        );
+    },
+
+    getListBaiBaoCongBoKhoaHoc(id: string): Promise<ResponseBaseModel<IBaiBaoCongBoGroup>> {
+        return axiosClient.get(`api/core/khcn/gv/cong-bo-kh/bai-bao?mans=${id}`);
+    },
+
+    getListGiaiThuongKHCN(id: string): Promise<ResponseBaseModel<IGIaiThuongKHCN[]>> {
+        return axiosClient.get(`api/core/khcn/gv/cong-bo-kh/giai-thuong?mans=${id}`);
+    },
+
+    getListSachXuatBan(pageSize: number, pageNumber: number, id: string): Promise<ResponseBaseApiModel<ISachXuatBan[]>> {
+        return axiosClient.get(
+            `api/core/khcn/gv/cong-bo-kh/tai-lieu?mans=${id}&pageSize=${pageSize}&pageNumber=${pageNumber}`
+        );
+    },
+
+    getListTriTue(pageSize: number, pageNumber: number, id: string): Promise<ResponseBaseApiModel<ITriTue[]>> {
+        return axiosClient.get(
+            `api/core/khcn/gv/cong-bo-kh/so-huu-tri-tue?mans=${id}&pageSize=${pageSize}&pageNumber=${pageNumber}`
+        );
+    },
+
+    getQuaTrinhCongTac(mans: string): Promise<ResponseBaseModel<IViewRowQuaTrinhCongTac[]>> {
+        return axiosClient.get(`/api/core/khcn/gv/thong-tin-chung/${mans}/qua-trinh-cong-tac`);
+    },
+
+    getQuaTrinhDaoTao(mans: string): Promise<ResponseBaseModel<IViewRowQuaTrinhDaoTao[]>> {
+        return axiosClient.get(`/api/core/khcn/gv/thong-tin-chung/${mans}/qua-trinh-dao-tao`);
+    },
+};

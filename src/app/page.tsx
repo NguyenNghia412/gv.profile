@@ -1,160 +1,126 @@
+'use client'
 import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from "@/components/ui/table";
 import { IProfile } from "@/models/profile.model";
-
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { ProfileUserApi } from "./services/profile_user";
+import { TableSkeleton } from "@/components/ui/loading";
+import { Pagination } from "@/components/ui/pagination";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
+
+console.log('env', process.env)
 
 export default function Home() {
-  const data: IProfile[] = [
-    {
-      stt: 1,
-      hoTen: "Vũ Ngọc Khiêm",
-      donVi: "Hội đồng Trường",
-      coSo: "Hà Nội",
-      lyLichKhoaHoc: "Xem chi tiết",
-    },
-    {
-      stt: 2,
-      hoTen: "Nguyễn Hoàng Long",
-      donVi: "Ban Giám hiệu",
-      coSo: "Hà Nội",
-      lyLichKhoaHoc: "Xem chi tiết",
-    },
-    {
-      stt: 3,
-      hoTen: "Nguyễn Văn Lâm",
-      donVi: "Ban Giám hiệu",
-      coSo: "Hà Nội",
-      lyLichKhoaHoc: "Xem chi tiết",
-    },
-    {
-      stt: 4,
-      hoTen: "Trần Hà Thanh",
-      donVi: "Ban Giám hiệu",
-      coSo: "Hà Nội",
-      lyLichKhoaHoc: "Xem chi tiết",
-    },
-    {
-      stt: 5,
-      hoTen: "Lê Thu Sao",
-      donVi: "Công Đoàn",
-      coSo: "Hà Nội",
-      lyLichKhoaHoc: "Xem chi tiết",
-    },
-    {
-      stt: 6,
-      hoTen: "Tạ Thị Hồng Nhung",
-      donVi: "Khoa Công trình",
-      coSo: "Hà Nội",
-      lyLichKhoaHoc: "Xem chi tiết",
-    },
-    {
-      stt: 7,
-      hoTen: "Phùng Bá Thắng",
-      donVi: "Khoa Công trình",
-      coSo: "Hà Nội",
-      lyLichKhoaHoc: "Xem chi tiết",
-    },
-    {
-      stt: 8,
-      hoTen: "Nguyễn Anh Tuấn",
-      donVi: "Khoa Công trình",
-      coSo: "Hà Nội",
-      lyLichKhoaHoc: "Xem chi tiết",
-    },
-    {
-      stt: 9,
-      hoTen: "Nguyễn Thanh Hưng",
-      donVi: "Khoa Công trình",
-      coSo: "Hà Nội",
-      lyLichKhoaHoc: "Xem chi tiết",
-    },
-    {
-      stt: 10,
-      hoTen: "Nguyễn Tiến Hưng",
-      donVi: "Khoa Công trình",
-      coSo: "Hà Nội",
-      lyLichKhoaHoc: "Xem chi tiết",
-    },
-    {
-      stt: 11,
-      hoTen: "Lê Văn Mạnh",
-      donVi: "Khoa Công trình",
-      coSo: "Hà Nội",
-      lyLichKhoaHoc: "Xem chi tiết",
-    },
-    {
-      stt: 12,
-      hoTen: "Trần Anh Tuấn",
-      donVi: "Khoa Công trình",
-      coSo: "Hà Nội",
-      lyLichKhoaHoc: "Xem chi tiết",
-    },
-    {
-      stt: 13,
-      hoTen: "Nguyễn Hữu Giang",
-      donVi: "Khoa Công trình",
-      coSo: "Hà Nội",
-      lyLichKhoaHoc: "Xem chi tiết",
-    },
-    {
-      stt: 14,
-      hoTen: "Nguyễn Hữu May",
-      donVi: "Khoa Công trình",
-      coSo: "Hà Nội",
-      lyLichKhoaHoc: "Xem chi tiết",
-    },
-    {
-      stt: 15,
-      hoTen: "Đào Quang Huy",
-      donVi: "Khoa Công trình",
-      coSo: "Hà Nội",
-      lyLichKhoaHoc: "Xem chi tiết",
-    },
-  ];
+    const [dataUser, setDataUser] = useState<IProfile[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(25);
+    const [totalItems, setTotalItems] = useState(0);
+    const [keywordInput, setKeywordInput] = useState("");
+    const [keyword, setKeyword] = useState("");
 
-  return (
-    
-      <div>
-        <Table>
-          <TableCaption>Danh sách các giảng viên hiện tại</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[8px] font-bold">#</TableHead>
-              <TableHead className="font-bold">Giảng viên</TableHead>
-              <TableHead className="font-bold">Đơn vị</TableHead>
-              <TableHead className="font-bold">Cơ sở khoa học</TableHead>
-              <TableHead className="font-bold">Lý lịch khoa học</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data &&
-              data.map((item, i) => (
-                <TableRow key={`${i}`}>
-                  <TableCell>{item.stt}</TableCell>
-                  <TableCell>{item.hoTen}</TableCell>
-                  <TableCell>{item.donVi}</TableCell>
-                  <TableCell>{item.coSo}</TableCell>
-                  <TableCell>
-                    <Link
-                      href={"/teacher/thong-tin-chung"}
-                      target="_blank"
-                      className="underline text-blue-500 cursor-pointer"
-                    >
-                      {item.lyLichKhoaHoc}
-                    </Link>
-                  </TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </div>
-  );
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        setKeyword(keywordInput.trim());
+        setCurrentPage(1);
+    };
+
+    useEffect(() => {
+        setLoading(true);
+        ProfileUserApi.getListProfile(pageSize, currentPage, keyword)
+            .then(res => {
+                setDataUser(res.data.items)
+                setTotalItems(res.data.totalItems)
+            })
+            .catch(err => console.error(err))
+            .finally(() => {
+                console.log(totalItems)
+                setLoading(false)
+            })
+    }, [currentPage, pageSize, keyword])
+
+    const totalPages = Math.ceil(totalItems / pageSize);
+    const startItem = totalItems > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+    const endItem = Math.min(currentPage * pageSize, totalItems);
+
+    return (
+        <div className="container mx-auto py-6 px-4">
+            <form onSubmit={handleSearch} className="flex gap-2 mb-4">
+                <Input
+                    value={keywordInput}
+                    onChange={(e) => setKeywordInput(e.target.value)}
+                    placeholder="Nhập từ khóa tìm kiếm..."
+                    className="max-w-md bg-white border-gray-300"
+                />
+                <Button type="submit" className="bg-primaryBlue hover:bg-secondaryBlue text-white">
+                    <Search />
+                    Tìm kiếm
+                </Button>
+            </form>
+            <div className="bg-white rounded-lg shadow border">
+                <Table>
+                    <TableCaption>Danh sách các giảng viên hiện tại</TableCaption>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead className="w-[60px] font-bold">#</TableHead>
+                            <TableHead className="font-bold">Giảng viên</TableHead>
+                            <TableHead className="font-bold">Đơn vị</TableHead>
+                            <TableHead className="font-bold">Cơ sở khoa học</TableHead>
+                            <TableHead className="font-bold">Lý lịch khoa học</TableHead>
+                        </TableRow>
+                    </TableHeader>
+
+                    <TableBody>
+                        {loading ? (
+                            <TableSkeleton rows={5} columns={5} />
+                        ) : (
+                            dataUser &&
+                            dataUser.map((item, i) => (
+                                <TableRow key={`${item.mans}-${i}`}>
+                                    <TableCell className="font-medium">
+                                        {(currentPage - 1) * pageSize + i + 1}
+                                    </TableCell>
+                                    <TableCell className="font-medium">{item.hoTen}</TableCell>
+                                    <TableCell>{item.donVi}</TableCell>
+                                    <TableCell>{item.coSoKhoaHoc}</TableCell>
+                                    <TableCell>
+                                        <Link
+                                            href={`/teacher/ly-lich-khoa-hoc/${item.mans}`}
+                                            className="text-blue-600 hover:text-blue-800 underline"
+                                        >
+                                            Xem chi tiết
+                                        </Link>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
+                    </TableBody>
+                </Table>
+
+                {/* Pagination */}
+                {!loading && totalItems > 0 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        pageSize={pageSize}
+                        totalItems={totalItems}
+                        startItem={startItem}
+                        endItem={endItem}
+                        onPageChange={setCurrentPage}
+                        onPageSizeChange={setPageSize}
+                    />
+                )}
+            </div>
+        </div>
+    );
 }

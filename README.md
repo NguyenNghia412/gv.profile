@@ -37,4 +37,9 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## Docker
 
-`docker build -t gv.profile:latest .`
+```
+docker build -t gv.profile:latest .
+docker tag gv.profile nghiant9608/gv.profile:latest
+docker images
+docker push nghiant9608/gv.profile:latest
+```

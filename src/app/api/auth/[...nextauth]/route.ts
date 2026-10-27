@@ -1,0 +1,114 @@
+import NextAuth from "next-auth";
+
+const CONNECT_AUTHORIZE_URL = `${process.env.NEXT_PUBLIC_BASE_URL}/connect/authorize`;
+const CONNECT_TOKEN_URL = `${process.env.NEXT_PUBLIC_BASE_URL}/connect/token`;
+
+console.log("CONNECT_AUTHORIZE_URL:", CONNECT_AUTHORIZE_URL);
+console.log("CONNECT_TOKEN_URL:", CONNECT_TOKEN_URL);
+
+const handler = NextAuth({
+  providers: [
+    {
+      id: "openiddict",
+      name: "OpenIddict",
+      type: "oauth",
+
+      //   wellKnown: WELL_KNOWN_URL,
+
+      clientId: process.env.AUTH_CLIENT_ID,
+
+      clientSecret: process.env.AUTH_CLIENT_SECRET,
+
+      authorization: {
+        params: {
+          scope: "openid offline_access",
+        },
+        url: CONNECT_AUTHORIZE_URL,
+      },
+
+      // ✅ Chỉ thêm block này, không đụng gì khác
+      token: {
+        url: CONNECT_TOKEN_URL,
+        async request(context) {
+          const { provider, params, checks } = context;
+
+          const body = new URLSearchParams({
+            grant_type: "authorization_code",
+            code: params.code as string,
+            redirect_uri: provider.callbackUrl,
+            client_id: provider.clientId as string,
+            client_secret: provider.clientSecret as string,
+            ...(checks.code_verifier
+              ? { code_verifier: checks.code_verifier }
+              : {}),
+          });
+
+          const response = await fetch(CONNECT_TOKEN_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: body.toString(),
+          });
+
+          const tokens = await response.json();
+          return { tokens };
+        },
+      },
+
+      userinfo: {
+        url: `${process.env.NEXT_PUBLIC_BASE_URL}/connect/userinfo`,
+        async request(context) {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/connect/userinfo`,
+            {
+              headers: {
+                Authorization: `Bearer ${context.tokens.access_token}`,
+              },
+            },
+          );
+          return await response.json();
+        },
+      },
+
+      idToken: false,
+      checks: ["pkce", "state"],
+
+      profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+        };
+      },
+    },
+  ],
+
+  // Phải trùng với secret dùng ở getToken/encode trong /api/auth/refresh
+  secret: process.env.NEXTAUTH_SECRET,
+
+  session: {
+    strategy: "jwt", // store session in cookie (default good choice)
+  },
+
+  callbacks: {
+    async jwt({ token, account }) {
+      // Runs when login happens
+      if (account) {        token.access_token = account.access_token;
+        token.refresh_token = account.refresh_token;
+        token.id_token = account.id_token;
+      }
+      return token;
+    },
+
+    async session({ session, token }) {
+      return {
+        ...session,
+        access_token: token.access_token,
+        user: { ...session.user, id: token.sub },
+      };
+    },
+  },
+
+  debug: true,
+});
+
+export { handler as GET, handler as POST };
